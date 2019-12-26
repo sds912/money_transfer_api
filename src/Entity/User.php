@@ -12,10 +12,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ApiResource(
- *  attributes= {"security" = "is_granted('ROLE_USER')"},
+ *  attributes= {"security" = "is_granted('ROLE_ADMIN')"},
  *  collectionOperations={
- *    "get",
- *    "post" = {"security"="is_granted('ROLE_SUPER_ADMIN')"}
+ *  "get",
+ *   "post"={
+ *   "security_post_denormalize"="is_granted('ROLE_SUPER_ADMIN')"}
  * },
  *   normalizationContext={"groups"={"read"}},
  *   denormalizationContext={"groups"={"write"}}

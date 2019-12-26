@@ -20,7 +20,7 @@ class UserFixtures extends Fixture
 
         $superAdmin->setUsername('supperAdmin');
         $superAdmin->setPassword($this->encoder->encodePassword($superAdmin,'super'));
-        $superAdmin->setRoles(['ROLE_SUPER_ADMIN, ROLE_ADMIN']);
+        $superAdmin->setRoles(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN']);
         $manager->persist($superAdmin);
         $manager->flush();
     }
