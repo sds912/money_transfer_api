@@ -18,8 +18,16 @@ class UserFixtures extends Fixture
     {
         $superAdmin = new User();
 
-        $superAdmin->setUsername('supperAdmin');
-        $superAdmin->setPassword($this->encoder->encodePassword($superAdmin,'super'));
+        $superAdmin->setUsername('babs912');
+        $superAdmin->setEmail('senghor.pape912@hotmail.com');
+        $superAdmin->setPhone('+221777443663');
+        $superAdmin->setFname('Papa Babacar Ngor');
+        $superAdmin->setLname('Senghor');
+        $superAdmin->setCountry('Senegal');
+        $superAdmin->setCity('Dakar');
+        $superAdmin->setAddress('Parcelles Assainies');
+        $superAdmin->setActive(true);
+        $superAdmin->setPassword($this->encoder->encodePassword($superAdmin,'keurm912'));
         $superAdmin->setRoles(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN']);
         $manager->persist($superAdmin);
         $manager->flush();
