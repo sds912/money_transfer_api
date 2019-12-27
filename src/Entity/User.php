@@ -14,14 +14,24 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ApiResource(
  *  attributes= {"security" = "is_granted('ROLE_ADMIN')"},
  *  collectionOperations={
- *  "get",
- *   "post"={
- *   "security_post_denormalize"="is_granted('ROLE_SUPER_ADMIN')"}
+ *    "get",
+ *    "post"={
+ *     "security_post_denormalize"="is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_ADMIN')"
+ *      }
+ * },
+ *  itemOperations = {
+ *   "get",
+ *   "put" = {
+ *    "access_control"="is_granted('ROLE_SUPER_ADMIN')"
+ *  }
  * },
  *   normalizationContext={"groups"={"read"}},
  *   denormalizationContext={"groups"={"write"}}
  * )
  * @UniqueEntity(fields={"username"})
+ * @UniqueEntity(fields={"email"})
+ * @UniqueEntity(fields={"phone"})
+ * 
  */
 class User implements UserInterface
 {
@@ -56,41 +66,59 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
+     * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=15)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
+     * @Assert\Regex(pattern="/+[0-9]*$")
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
      */
     private $fname;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
      */
     private $lname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
      */
     private $address;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"read", "write"})
+     * @Assert\Type("bool")
      */
-    private $active;
+    private $active = true;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"read", "write"})
+     * @Assert\NotBlank()
      */
     private $city;
 
