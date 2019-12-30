@@ -2,6 +2,13 @@
 
 namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,25 +19,34 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ApiResource(
- *  attributes= {"security" = "is_granted('ROLE_ADMIN')"},
+ *  attributes= {
+ *     "normalization_context"={"groups"={"user.read"}},
+ *     "denormalization_context"={"groups"={"user.write"}},
+ *  },
  *  collectionOperations={
- *    "get",
+ *    "get"={
+ *       "security_get_normalize" = "is_granted('ROLE_ADMIN')"
+ *     },
  *    "post"={
- *     "security_post_denormalize"="is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_ADMIN')"
+ *     "security_post_denormalize"="is_granted('ROLE_ADMIN')",
  *      }
  * },
  *  itemOperations = {
- *   "get",
+ *   "get"={
+ *     "security_get_normalize" = "is_granted('ROLE_ADMIN')"
+ *   },
  *   "put" = {
- *    "access_control"="is_granted('ROLE_SUPER_ADMIN')"
+ *    "access_control"="is_granted('ROLE_SUPER_ADMIN') or object == user",
+ *     "denormalization_context" = {"groups"={"user.update"}},
+ *     "access_control_message"="acces refuse"
  *  }
  * },
- *   normalizationContext={"groups"={"read"}},
- *   denormalizationContext={"groups"={"write"}}
  * )
+ * 
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
+ * @ApiFilter(BooleanFilter::class, properties={"isActive"})
  * 
  */
 class User implements UserInterface
@@ -39,19 +55,23 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({
+     *  "user.read",
+     *  "user.write"
+     * })
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update", "supervisor.read"})
      * @Assert\NotBlank()
      */
     private $username;
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      */
     private $roles = [];
@@ -59,68 +79,92 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * @Groups({"write"})
-     * @Assert\NotBlank()
+     * @Groups({"user.write", "user.update"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      * @Assert\Email()
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=15)
-     * @Groups({"read", "write"})
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"user.read", "user.write"})
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/+[0-9]*$")
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      */
     private $fname;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      */
     private $lname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      */
     private $address;
 
     /**
-     * @ORM\Column(type="boolean")
-     * @Groups({"read", "write"})
+     * @ORM\Column(type="boolean", options={"default" : true})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\Type("bool")
      */
-    private $active = true;
+    private $isActive;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"read", "write"})
+     * @Groups({"user.read", "user.write", "user.update"})
      * @Assert\NotBlank()
      */
     private $city;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers", cascade={"persist"})
+     * @ApiSubresource(maxDepth=1)
+     */
+    private $supervisor;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor", cascade={"persist"})
+     * @ApiSubresource(maxDepth=1)
+     */
+    private $supervisorUsers;
+
+   
+    
+   
+    public function __construct()
+    {
+        $this->ownerAgencies = new ArrayCollection();
+        $this->casherAgencies = new ArrayCollection();
+        $this->supervisorAgencies = new ArrayCollection();
+        $this->adminAgencies = new ArrayCollection();
+        $this->permissions = new ArrayCollection();
+        $this->supervisor = new ArrayCollection();
+        $this->supervisorUsers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -255,14 +299,14 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getActive(): ?bool
+    public function getIsActive(): ?bool
     {
-        return $this->active;
+        return $this->isActive;
     }
 
-    public function setActive(bool $active): self
+    public function setIsActive(bool $isActive): self
     {
-        $this->active = $active;
+        $this->isActive = $isActive;
 
         return $this;
     }
@@ -290,4 +334,61 @@ class User implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getSupervisor(): Collection
+    {
+        return $this->supervisor;
+    }
+
+    public function addSupervisor(self $supervisor): self
+    {
+        if (!$this->supervisor->contains($supervisor)) {
+            $this->supervisor[] = $supervisor;
+        }
+
+        return $this;
+    }
+
+    public function removeSupervisor(self $supervisor): self
+    {
+        if ($this->supervisor->contains($supervisor)) {
+            $this->supervisor->removeElement($supervisor);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getSupervisorUsers(): Collection
+    {
+        return $this->supervisorUsers;
+    }
+
+    public function addSupervisorUser(self $supervisorUser): self
+    {
+        if (!$this->supervisorUsers->contains($supervisorUser)) {
+            $this->supervisorUsers[] = $supervisorUser;
+            $supervisorUser->addSupervisor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSupervisorUser(self $supervisorUser): self
+    {
+        if ($this->supervisorUsers->contains($supervisorUser)) {
+            $this->supervisorUsers->removeElement($supervisorUser);
+            $supervisorUser->removeSupervisor($this);
+        }
+
+        return $this;
+    }
+
+   
+   
 }

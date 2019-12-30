@@ -14,7 +14,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         login:
-            pattern:  ^/login
+            pattern: ^/login
             stateless: true
             anonymous: true
             json_login:
@@ -29,6 +29,7 @@ security:
             guard:
                 authenticators:
                     - lexik_jwt_authentication.jwt_token_authenticator
+                    #- app.jwt_authenticator
 
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
