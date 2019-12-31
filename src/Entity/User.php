@@ -158,6 +158,12 @@ class User implements UserInterface
      */
     private $supervisorUsers;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users", cascade={"persist"})
+     * @Groups({"user.read", "user.write"})
+     */
+    private $userRoles;
+
    
     
    
@@ -197,13 +203,14 @@ class User implements UserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
+       // $roles[] = $this->userRoles;
 
         return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
+        //$this->roles = $this->getUserRoles()->getRoleName();
 
         return $this;
     }
@@ -386,6 +393,18 @@ class User implements UserInterface
             $this->supervisorUsers->removeElement($supervisorUser);
             $supervisorUser->removeSupervisor($this);
         }
+
+        return $this;
+    }
+
+    public function getUserRoles(): ?Roles
+    {
+        return $this->userRoles;
+    }
+
+    public function setUserRoles(?Roles $userRoles): self
+    {
+        $this->userRoles = $userRoles;
 
         return $this;
     }

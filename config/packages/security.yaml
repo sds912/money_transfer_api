@@ -9,6 +9,11 @@ security:
                 class: App\Entity\User
                 property: username
 
+    role_hierarchy:
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_CASHER, ROLE_USER]
+        ROLE_ADMIN: [ROLE_CASHER, ROLE_USER]
+        ROLE_CASHER: [ROLE_USER]
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -33,4 +38,4 @@ security:
 
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: [IS_AUTHENTICATED_FULLY] }
