@@ -39,7 +39,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *    "access_control"="is_granted('ROLE_SUPER_ADMIN') or object == user",
  *     "denormalization_context" = {"groups"={"user.update"}},
  *     "access_control_message"="acces refuse"
- *  }
+ *  }, 
+ *  "block"={
+ *     "access_control"="is_granted('ROLE_SUPER_ADMIN')",
+ *     "method"="PUT",
+ *     "path"="/users/{id}/block.{_format}",
+ *     "denormalization_context" = {"groups"={"super.block"}},
+ *   }
  * },
  * )
  * 
@@ -121,7 +127,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="boolean", options={"default" : true})
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({"user.read", "user.write", "super.block"})
      * @Assert\Type("bool")
      */
     private $isActive;
@@ -157,11 +163,6 @@ class User implements UserInterface
    
     public function __construct()
     {
-        $this->ownerAgencies = new ArrayCollection();
-        $this->casherAgencies = new ArrayCollection();
-        $this->supervisorAgencies = new ArrayCollection();
-        $this->adminAgencies = new ArrayCollection();
-        $this->permissions = new ArrayCollection();
         $this->supervisor = new ArrayCollection();
         $this->supervisorUsers = new ArrayCollection();
     }
