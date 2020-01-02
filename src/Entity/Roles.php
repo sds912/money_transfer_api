@@ -28,6 +28,7 @@ class Roles
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="userRoles")
+     * @Groups("admin.read")
      */
     private $users;
 

@@ -1,4 +1,11 @@
 resources:
+  App\Entity\Roles: 
+    attributes:
+      normalization_context:
+        groups: ['admin.read']
+      denormalization_context:
+        groups: ['admin.write']
+
   App\Entity\User: 
     attributes:
       security: 'is_granted("ROLE_ADMIN")'
@@ -21,6 +28,9 @@ resources:
         path: '/users/{id}/block'
         requirements:
           id: '\d+'
+
+  App\Entity\Agency: ~
+
         
 
      

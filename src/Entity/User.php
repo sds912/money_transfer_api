@@ -128,24 +128,31 @@ class User implements UserInterface
     private $city;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers")
      * @Groups({"read"})
      * @ApiSubresource(maxDepth=1)
      */
     private $supervisor;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor")
      * @Groups({"read"})
      * @ApiSubresource(maxDepth=1)
      */
     private $supervisorUsers;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users")
      * @Groups({"read"})
      */
     private $userRoles;
+
+    
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="agency_owner")
+     */
+    private $owner_agencies;
 
    
     
@@ -154,6 +161,8 @@ class User implements UserInterface
     {
         $this->supervisor = new ArrayCollection();
         $this->supervisorUsers = new ArrayCollection();
+        $this->ownerAgencies = new ArrayCollection();
+        $this->owner_agencies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -388,4 +397,37 @@ class User implements UserInterface
     {
         return $this->fname;
     }
+
+    /**
+     * @return Collection|Agency[]
+     */
+    public function getOwnerAgencies(): Collection
+    {
+        return $this->owner_agencies;
+    }
+
+    public function addOwnerAgency(Agency $ownerAgency): self
+    {
+        if (!$this->owner_agencies->contains($ownerAgency)) {
+            $this->owner_agencies[] = $ownerAgency;
+            $ownerAgency->setAgencyOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnerAgency(Agency $ownerAgency): self
+    {
+        if ($this->owner_agencies->contains($ownerAgency)) {
+            $this->owner_agencies->removeElement($ownerAgency);
+            // set the owning side to null (unless already changed)
+            if ($ownerAgency->getAgencyOwner() === $this) {
+                $ownerAgency->setAgencyOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
 }

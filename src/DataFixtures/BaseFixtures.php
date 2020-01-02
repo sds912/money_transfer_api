@@ -22,6 +22,12 @@ class BaseFixtures extends Fixture
     {
         $faker =  Factory::create('fr_FR');
          
+         $role1 = new  Roles();
+         $role1->setRoleName('ROLE_SUPER_ADMIN');
+
+         $manager->persist($role1);
+
+
 
         $superAdmin = new User();
 
@@ -35,11 +41,11 @@ class BaseFixtures extends Fixture
         $superAdmin->setCountry($faker->country);
         $superAdmin->setCity($faker->city);
         $superAdmin->setAddress($faker->address);
-        $role = new Roles();
-        $role->setRoleName('ROLE_SUPER_ADMIN');
-        $superAdmin->setUserRoles($role);
-        $manager->persist($superAdmin);
 
+        $role1->addUser($superAdmin);
+        $manager->persist($superAdmin);
+        
+        /*
         for ($i=0; $i < 10; $i++) { 
 
             $admin = new User();
@@ -82,6 +88,7 @@ class BaseFixtures extends Fixture
                 $manager->persist($casher);
             }
         }
+        */
 
         $manager->flush();
     }
