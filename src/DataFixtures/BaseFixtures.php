@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Agency;
+use App\Entity\Roles;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -34,7 +35,9 @@ class BaseFixtures extends Fixture
         $superAdmin->setCountry($faker->country);
         $superAdmin->setCity($faker->city);
         $superAdmin->setAddress($faker->address);
-        $superAdmin->setRoles(['ROLE_SUPER_ADMIN','ROLE_ADMIN','CASHER']);
+        $role = new Roles();
+        $role->setRoleName('ROLE_SUPER_ADMIN');
+        $superAdmin->setUserRoles($role);
         $manager->persist($superAdmin);
 
         for ($i=0; $i < 10; $i++) { 
@@ -50,7 +53,9 @@ class BaseFixtures extends Fixture
             $admin->setCountry($faker->country);
             $admin->setCity($faker->city);
             $admin->setAddress($faker->address);
-            $admin->setRoles(['ROLE_ADMIN', 'CASHER']);
+            $role = new Roles();
+            $role->setRoleName('ROLE_ADMIN');
+            $admin->setUserRoles($role);
             $admin->addSupervisor($superAdmin);
             $superAdmin->addSupervisorUser($admin);
 
@@ -68,7 +73,9 @@ class BaseFixtures extends Fixture
                 $casher->setCountry($faker->country);
                 $casher->setCity($faker->city);
                 $casher->setAddress($faker->address);
-                $casher->setRoles(['CASHER']);
+                $role = new Roles();
+                $role->setRoleName('ROLE_CASHER');
+                $casher->setUserRoles($role);
                 $casher->addSupervisor($admin);
                 $admin->addSupervisorUser($casher);
 

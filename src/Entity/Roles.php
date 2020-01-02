@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,6 +22,7 @@ class Roles
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"admin.write"})
      */
     private $role_name;
 
@@ -81,5 +82,11 @@ class Roles
         }
 
         return $this;
+    }
+    
+
+    public function __toString()
+    {
+        return $this->role_name;
     }
 }

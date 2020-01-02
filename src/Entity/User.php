@@ -18,37 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ApiResource(
- *  attributes= {
- *     "normalization_context"={"groups"={"user.read"}},
- *     "denormalization_context"={"groups"={"user.write"}},
- *  },
- *  collectionOperations={
- *    "get"={
- *       "security_get_normalize" = "is_granted('ROLE_ADMIN')"
- *     },
- *    "post"={
- *     "security_post_denormalize"="is_granted('ROLE_ADMIN')",
- *      }
- * },
- *  itemOperations = {
- *   "get"={
- *     "security_get_normalize" = "is_granted('ROLE_ADMIN')"
- *   },
- *   "put" = {
- *    "access_control"="is_granted('ROLE_SUPER_ADMIN') or object == user",
- *     "denormalization_context" = {"groups"={"user.update"}},
- *     "access_control_message"="acces refuse"
- *  }, 
- *  "block"={
- *     "access_control"="is_granted('ROLE_SUPER_ADMIN')",
- *     "method"="PUT",
- *     "path"="/users/{id}/block.{_format}",
- *     "denormalization_context" = {"groups"={"super.block"}},
- *   }
- * },
- * )
- * 
+ 
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
@@ -62,36 +32,32 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({
-     *  "user.read",
-     *  "user.write"
+     *  "write"
      * })
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user.read", "user.write", "user.update", "supervisor.read"})
+     * @Groups({"read", "write"})
      * @Assert\NotBlank()
      */
     private $username;
 
     /**
-     * @ORM\Column(type="json")
-     * @Groups({"user.read", "user.write", "user.update"})
-     * @Assert\NotBlank()
-     */
-    private $roles = [];
-
-    /**
      * @var string The hashed password
+     * @Groups({
+     *  "write"
+     * }) 
      * @ORM\Column(type="string")
-     * @Groups({"user.write", "user.update"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      * @Assert\Email()
      */
@@ -99,68 +65,85 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user.read", "user.write"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      */
     private $fname;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      */
     private $lname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      */
     private $address;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : true})
-     * @Groups({"user.read", "user.write", "super.block"})
+     * @Groups({
+     *  "write",
+     *   "read"
+     * })
      * @Assert\Type("bool")
      */
-    private $isActive;
+    private $isActive = true;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"user.read", "user.write", "user.update"})
+     * @Groups({
+     *  "write"
+     * })
      * @Assert\NotBlank()
      */
     private $city;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers", cascade={"persist"})
+     * @Groups({"read"})
      * @ApiSubresource(maxDepth=1)
      */
     private $supervisor;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor", cascade={"persist"})
+     * @Groups({"read"})
      * @ApiSubresource(maxDepth=1)
      */
     private $supervisorUsers;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users", cascade={"persist"})
-     * @Groups({"user.read", "user.write"})
+     * @Groups({"read"})
      */
     private $userRoles;
 
@@ -198,22 +181,13 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function getRoles(): array
+    public function getRoles(): Array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-       // $roles[] = $this->userRoles;
+       return [$this->userRoles->getRoleName()];
 
-        return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
-    {
-        //$this->roles = $this->getUserRoles()->getRoleName();
-
-        return $this;
-    }
+    
 
     /**
      * @see UserInterface
@@ -410,5 +384,8 @@ class User implements UserInterface
     }
 
    
-   
+    public function __toString()
+    {
+        return $this->fname;
+    }
 }

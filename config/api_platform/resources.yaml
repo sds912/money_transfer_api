@@ -1,0 +1,28 @@
+resources:
+  App\Entity\User: 
+    attributes:
+      security: 'is_granted("ROLE_ADMIN")'
+      normalization_context:
+        groups: ['read']
+      denormalization_context:
+        groups: ['write']
+        
+    collectionOperations:
+      post: 
+        denormalize_post_context:
+          groups: ['admin.write']
+      get: ~
+
+    itemOperations:
+      get: ~
+      put: 
+        security: 'is_granted("ROLE_ADMIN")'
+        method: 'PUT'
+        path: '/users/{id}/block'
+        requirements:
+          id: '\d+'
+        
+
+     
+
+ 
