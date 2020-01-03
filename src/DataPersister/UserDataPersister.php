@@ -2,7 +2,7 @@
 namespace App\DataPersister;
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use App\Entity\Roles;
+use App\PermissionRoles;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -45,10 +45,11 @@ class UserDataPersister implements DataPersisterInterface
     public function persist($data)
     {
         $currentUser = $this->security->getUser();
+        $password = $data->getUsername();
 
-        if($currentUser->getRoles() != "ROLE_SUPER_ADMIN")
+        if($currentUser->getRoles() != PermissionRoles::SUPER_ADMIN)
         {
-            if ("ROLE_SUPER_ADMIN" != $data->getUserRoles()) 
+            if (PermissionRoles::SUPER_ADMIN != $data->getUserRoles()) 
             { 
                $data->addSupervisor($currentUser);
             }else{
@@ -56,14 +57,18 @@ class UserDataPersister implements DataPersisterInterface
             }
         }
 
-        
-        if($data->getPassword())
+        if($currentUser->getRoles() == PermissionRoles::OWNER)
         {
-            $data->setPassword(
-                $this->encoder->encodePassword($data, $data->getPassword())
-            );
-            $data->eraseCredentials();
+            if ($data->getRoles() != PermissionRoles::AGENCY_ADMIN || $data->getRoles() != PermissionRoles::AGENCY_CASHIER)
+            {
+                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier");
+                
+            }
         }
+
+        $data->setPassword($this->encoder->encodePassword($data, $password));
+        $data->eraseCredentials();
+    
         $this->entityManager->persist($data);
 
         $this->entityManager->flush();
