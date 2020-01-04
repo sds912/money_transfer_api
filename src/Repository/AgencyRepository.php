@@ -47,4 +47,20 @@ class AgencyRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * @param int $id
+     * 
+     * @return Agency
+     */
+
+    public function findOneById(int $id): ?Agency
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.id = :val')
+            ->setParameter('val', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

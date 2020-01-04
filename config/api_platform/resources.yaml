@@ -1,35 +1,65 @@
 resources:
   App\Entity\Roles: 
     attributes:
+      security: 'is_granted("ROLE_CASHIER") or object == user'
+      security_message: 'Only super admin can manage roles'
       normalization_context:
         groups: ['admin.read']
       denormalization_context:
+        api_allow_update: true
         groups: ['admin.write']
+    collectionOperations:
+      post: ~
+      get: ~
+    itemOperations:
+      get: ~
+      put: ~
+      delete: ~
+  
 
   App\Entity\User: 
     attributes:
-      security: 'is_granted("ROLE_ADMIN")'
-      normalization_context:
-        groups: ['read']
       denormalization_context:
-        groups: ['write']
-        
+        groups: ['user.write','user.read']
+      normalization_context: 
+        groups: ['user.write', 'user.read']
+      security: 'is_granted("ROLE_ADMIN")'
+
     collectionOperations:
-      post: 
-        denormalize_post_context:
-          groups: ['admin.write']
-      get: ~
+      post:
+        method: 'POST' 
+      get: 
+        method: 'GET'
+        
+
 
     itemOperations:
-      get: ~
+      get:
+        method: 'GET'
       put: 
         security: 'is_granted("ROLE_ADMIN")'
+        security_message: 'Only Super Admin can block user'
         method: 'PUT'
         path: '/users/{id}/block'
         requirements:
           id: '\d+'
 
-  App\Entity\Agency: ~
+  App\Entity\Agency: 
+    security: 'is_granted("ROLE_USER")'
+    collectionOperations:
+      post:
+        method: 'POST'
+        security: 'is_granted("ROLE_ADMIN")'
+        security_message: 'Only Admin can add agency'
+      
+      get:
+        method: 'GET'
+        security: 'is_granted("ROLE_ADMIN" or object.agencyOwner == user)'
+        security_message: 'You can not access to this resources'
+
+    itemOperations:
+      get: ~
+      put: ~
 
         
 

@@ -29,9 +29,18 @@ services:
     # please note that last definitions always *replace* previous ones
     'App\DataPersister\UserDataPersister': ~
         #tags: [ 'api_platform.data_persister' ]
+    'App\DataPersister\AgencyDataPersister': ~
 
     App\Listeners\JWTAuthSuccessListener:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccess}
     
-    
+    App\Serializer\AgencyDenormalizer:
+        arguments:
+            # Choose the denormalizer depending on your output.
+            # For example, for JSON+LD it's "api_platform.jsonld.normalizer.item"
+            - '@api_platform.jsonld.normalizer.item'
+            - '@App\Repository\AgencyRepository'
+        tags:
+            # Priority is important but any value more than 8 should be ok
+            - { name: serializer.normalizer, priority: 17 }

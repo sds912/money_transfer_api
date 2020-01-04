@@ -8,7 +8,6 @@ use App\Entity\Roles;
 use App\PermissionRoles;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use stdClass;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 
-class UserDataPersister implements DataPersisterInterface
+class AgencyDataPersister implements DataPersisterInterface
 {
 
     private $entityManager;
@@ -40,7 +39,7 @@ class UserDataPersister implements DataPersisterInterface
 
     public function supports($data): bool
     {
-      return $data instanceof User;  
+      return $data instanceof Agency;  
     }
 
     /**
@@ -49,35 +48,8 @@ class UserDataPersister implements DataPersisterInterface
     public function persist($data)
     {
 
-        //var_dump($data); die();
         $currentUser = $this->security->getUser();
-        $password = $data->getUsername();
-        
-    
-
-
-        if($currentUser->getRoles() != PermissionRoles::SUPER_ADMIN)
-        {
-            if (PermissionRoles::SUPER_ADMIN != $data->getUserRoles()) 
-            { 
-               $data->addSupervisor($currentUser);
-            }else{
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can not Change Super Admin Attributes");
-            }
-        }
-
-        if($currentUser->getRoles() == PermissionRoles::OWNER)
-        {
-            
-            if ($data->getRoles() != PermissionRoles::AGENCY_ADMIN || $data->getRoles() != PermissionRoles::AGENCY_CASHIER)
-            {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier");
-                
-            }
-        }
-
-        $data->setPassword($this->encoder->encodePassword($data, $password));
-        $data->eraseCredentials();
+       
     
         $this->entityManager->persist($data);
         $this->entityManager->flush();

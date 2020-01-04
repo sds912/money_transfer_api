@@ -17,7 +17,6 @@ security:
         ROLE_AGENCY_ADMIN: [ROLE_AGENCY_CASHIER,ROLE_USER]
         ROLE_AGENCY_CASHER: [ROLE_USER]
         
-
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -38,7 +37,6 @@ security:
             guard:
                 authenticators:
                     - lexik_jwt_authentication.jwt_token_authenticator
-                    #- app.jwt_authenticator
 
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }

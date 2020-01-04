@@ -2,10 +2,19 @@
 
 namespace App\Entity;
 
+
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AgencyRepository")
+ * 
+ * @UniqueEntity(fields={"code"})
+ * @UniqueEntity(fields={"owner"})
  */
 class Agency
 {
@@ -13,54 +22,69 @@ class Agency
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *  @Groups({"admin.write","admin.read"})
      */
     private $id;
+    
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"admin.write", "admin.read"})
+     * @Assert\NotBlank()
+     * @Assert\Length(
+     *   min = 5,
+     *   max = 5
+     * )
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"admin.write","admin.read"})
+     * @Assert\NotBlank()
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=60)
+     * @Groups({"admin.write","admin.read"})
+     * @Assert\NotBlank()
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"admin.write","admin.read"})
+     * @Assert\NotBlank()
      */
     private $address;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"admin.write","admin.read"})
+     * @Assert\NotBlank()
      */
     private $amount;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"admin.write","admin.read"})
+     * @Assert\NotBlank()
      */
     private $isActive;
 
-  
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
-     */
-    private $agency_admin;
-
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
-     */
-    private $agency_cashier;
-
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="owner_agencies")
+     * @Groups({"admin.write","admin.read"})
+     * @Assert\Valid()
+     * @ApiSubresource(maxDepth=1)
+     * @Assert\NotBlank()
      */
-    private $agency_owner;
+    private $owner;
+
+    
+  
+    
 
     public function getId(): ?int
     {
@@ -139,45 +163,24 @@ class Agency
         return $this;
     }
 
+   
+
+
+    public function __toString(){
+       return $this->address;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
   
-    public function getAgencyAdmin(): ?User
-    {
-        return $this->agency_admin;
-    }
-
-    public function setAgencyAdmin(?User $agency_admin): self
-    {
-        $this->agency_admin = $agency_admin;
-
-        return $this;
-    }
-
-    public function getAgencyCashier(): ?User
-    {
-        return $this->agency_cashier;
-    }
-
-    public function setAgencyCashier(?User $agency_cashier): self
-    {
-        $this->agency_cashier = $agency_cashier;
-
-        return $this;
-    }
-
-    public function getAgencyOwner(): ?User
-    {
-        return $this->agency_owner;
-    }
-
-    public function setAgencyOwner(?User $agency_owner): self
-    {
-        $this->agency_owner = $agency_owner;
-
-        return $this;
-    }
-
-    public function __toString()
-    {
-        return $this->city;
-    }
 }

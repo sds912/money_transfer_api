@@ -32,14 +32,19 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({
-     *  "write"
+     *  "user.read",
+     *  "user.write"
+     * 
      * })
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"read", "write"})
+     * @Groups({
+     * "user.read", 
+     * "user.write"
+     * })
      * @Assert\NotBlank()
      */
     private $username;
@@ -47,7 +52,7 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @Groups({
-     *  "write"
+     *  "user.write"
      * }) 
      * @ORM\Column(type="string")
      */
@@ -56,7 +61,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({
-     *  "write"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\NotBlank()
      * @Assert\Email()
@@ -66,7 +72,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({
-     *  "write"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\NotBlank()
      */
@@ -75,7 +82,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=60)
      * @Groups({
-     *  "write"
+     *  "user.read",
+     *  "user.write"
      * })
      * @Assert\NotBlank()
      */
@@ -84,7 +92,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=60)
      * @Groups({
-     *  "write"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\NotBlank()
      */
@@ -93,7 +102,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({
-     *  "write"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\NotBlank()
      */
@@ -102,8 +112,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="boolean", options={"default" : true})
      * @Groups({
-     *  "write",
-     *   "read"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\Type("bool")
      */
@@ -112,7 +122,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=60)
      * @Groups({
-     *  "write"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\NotBlank()
      */
@@ -121,7 +132,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=60)
      * @Groups({
-     *  "write"
+     *  "user.write",
+     *  "user.read"
      * })
      * @Assert\NotBlank()
      */
@@ -129,39 +141,50 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers")
-     * @Groups({"read"})
+     * @Groups({
+     *  "user.write",
+     *  "user.read"
+     * })
      * @ApiSubresource(maxDepth=1)
      */
     private $supervisor;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor")
-     * @Groups({"read"})
+     * @Groups({
+     *  "user.write",
+     *  "user.read"
+     * })
      * @ApiSubresource(maxDepth=1)
      */
     private $supervisorUsers;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users")
-     * @Groups({"read"})
+     * @ApiSubresource(maxDepth=1)
+     * @Groups({
+     *  "user.write",
+     *  "user.read"
+     * })
+     * 
      */
     private $userRoles;
 
-    
-
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="agency_owner")
+     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="owner", cascade={"persist"})
+     * @ApiSubresource(maxDepth=1)
+     * @Groups({
+     *  "user.write",
+     *  "user.read"
+     * })
      */
     private $owner_agencies;
 
-   
-    
-   
+
     public function __construct()
     {
         $this->supervisor = new ArrayCollection();
         $this->supervisorUsers = new ArrayCollection();
-        $this->ownerAgencies = new ArrayCollection();
         $this->owner_agencies = new ArrayCollection();
     }
 
@@ -410,7 +433,7 @@ class User implements UserInterface
     {
         if (!$this->owner_agencies->contains($ownerAgency)) {
             $this->owner_agencies[] = $ownerAgency;
-            $ownerAgency->setAgencyOwner($this);
+            $ownerAgency->setOwner($this);
         }
 
         return $this;
@@ -421,13 +444,15 @@ class User implements UserInterface
         if ($this->owner_agencies->contains($ownerAgency)) {
             $this->owner_agencies->removeElement($ownerAgency);
             // set the owning side to null (unless already changed)
-            if ($ownerAgency->getAgencyOwner() === $this) {
-                $ownerAgency->setAgencyOwner(null);
+            if ($ownerAgency->getOwner() === $this) {
+                $ownerAgency->setOwner(null);
             }
         }
 
         return $this;
     }
 
+   
+   
     
 }
