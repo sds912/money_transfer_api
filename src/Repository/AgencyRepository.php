@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Agency;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -48,19 +49,5 @@ class AgencyRepository extends ServiceEntityRepository
     }
     */
 
-    /**
-     * @param int $id
-     * 
-     * @return Agency
-     */
-
-    public function findOneById(int $id): ?Agency
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.id = :val')
-            ->setParameter('val', $id)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
+    
 }

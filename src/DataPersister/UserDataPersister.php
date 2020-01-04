@@ -49,12 +49,31 @@ class UserDataPersister implements DataPersisterInterface
     public function persist($data)
     {
 
-        //var_dump($data); die();
+        
+
+    
+
         $currentUser = $this->security->getUser();
         $password = $data->getUsername();
         
     
+       $uri = $this->request->getCurrentRequest()->getPathInfo(); 
+       $pattern = '/\/api\/users\/\d+\/block/';
+        if(preg_match($pattern,$uri))
+        {
+            if($data->getUserRoles()->getRoleName() == PermissionRoles::OWNER)
+            {
+                $agencies = $this->entityManager->getRepository(Agency::class)->findBy(['owner'=>$data]);
+                foreach ($agencies as $agency) {
+                   $agency->setIsActive(!$agency->getIsActive());
+                   $this->entityManager->persist($agency);
+                }
+            }
+    
+        }
 
+
+        
 
         if($currentUser->getRoles() != PermissionRoles::SUPER_ADMIN)
         {
