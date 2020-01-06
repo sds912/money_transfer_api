@@ -55,14 +55,12 @@ resources:
       get: 
         method: 'GET'
         
-
-
     itemOperations:
       get:
         method: 'GET'
       put: 
-        security: 'is_granted("ROLE_ADMIN")'
-        security_message: 'Only Super Admin can block user'
+        security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
+        security_message: 'Only Admin can block user'
         method: 'PUT'
         path: '/users/{id}/block'
         requirements:

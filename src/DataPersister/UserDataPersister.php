@@ -71,6 +71,18 @@ class UserDataPersister implements DataPersisterInterface
                    $this->entityManager->persist($agency);
                 }
             }
+
+            if($currentRole === PermissionRoles::OWNER)
+            {
+              $owner = $this->entityManager->getRepository(User::class)->findOneBY(['username'=>$currentUser->getUsername()]);
+              $user = $this->entityManager->getRepository(User::class)->findOneBy(['username'=>$data->getUsername()]);
+
+              if($user->getSupervisor()[0] != $owner)
+              {
+                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You cann't manage this user");
+              }
+              
+            }
     
         }
 
@@ -87,21 +99,16 @@ class UserDataPersister implements DataPersisterInterface
             }
         }
         if($currentRole === PermissionRoles::OWNER)
-        {
-            
+        { 
             if ($dataRole != PermissionRoles::AGENCY_ADMIN && $dataRole != PermissionRoles::AGENCY_CASHIER)
             {
                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create admin or agency cashier for your account");
             }
-
-           
-
         }else{
-
+            
             if ($dataRole === PermissionRoles::AGENCY_ADMIN || $dataRole == PermissionRoles::AGENCY_CASHIER)
             {
                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create system users");
-                
             } 
         }
 
