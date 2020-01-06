@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- 
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
@@ -142,44 +141,52 @@ class User implements UserInterface
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers")
      * @Groups({
-     *  "user.write",
-     *  "user.read"
+     *  "user.write"
      * })
-     * @ApiSubresource(maxDepth=1)
+     * @ApiSubresource()
      */
     private $supervisor;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor")
      * @Groups({
-     *  "user.write",
-     *  "user.read"
+     *  "user.write"
      * })
-     * @ApiSubresource(maxDepth=1)
+     * @ApiSubresource()
      */
     private $supervisorUsers;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users")
-     * @ApiSubresource(maxDepth=1)
      * @Groups({
-     *  "user.write",
-     *  "user.read"
+     *  "user.read",
+     *  "user.write"
      * })
+     * @ApiSubresource()
      * 
      */
     private $userRoles;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="owner", cascade={"persist"})
-     * @ApiSubresource(maxDepth=1)
+     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="owner")
      * @Groups({
      *  "user.write",
-     *  "user.read"
      * })
+     * @ApiSubresource()
      */
     private $owner_agencies;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Agency", inversedBy="cashiers")
+     * @Groups({
+     *  "user.write",
+     * })
+     * @ApiSubresource()
+     */
+    private $cashier_agency;
+
+  
+  
 
     public function __construct()
     {
@@ -451,6 +458,21 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function getCashierAgency(): ?Agency
+    {
+        return $this->cashier_agency;
+    }
+
+    public function setCashierAgency(?Agency $cashier_agency): self
+    {
+        $this->cashier_agency = $cashier_agency;
+
+        return $this;
+    }
+
+    
+
 
    
    

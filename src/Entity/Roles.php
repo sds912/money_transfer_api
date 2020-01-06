@@ -22,13 +22,13 @@ class Roles
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin.write"})
+     * @Groups({"role.write"})
      */
     private $role_name;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="userRoles")
-     * @Groups("admin.read")
+     * @Groups("role.read")
      */
     private $users;
 

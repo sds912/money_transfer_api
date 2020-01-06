@@ -55,13 +55,15 @@ class UserDataPersister implements DataPersisterInterface
 
         $currentUser = $this->security->getUser();
         $password = $data->getUsername();
+        $currentRole = $currentUser->getRoles()[0];
+        $dataRole = $data->getUserRoles()->getRoleName();
         
     
        $uri = $this->request->getCurrentRequest()->getPathInfo(); 
        $pattern = '/\/api\/users\/\d+\/block/';
         if(preg_match($pattern,$uri))
         {
-            if($data->getUserRoles()->getRoleName() == PermissionRoles::OWNER)
+            if($dataRole == PermissionRoles::OWNER)
             {
                 $agencies = $this->entityManager->getRepository(Agency::class)->findBy(['owner'=>$data]);
                 foreach ($agencies as $agency) {
@@ -75,25 +77,35 @@ class UserDataPersister implements DataPersisterInterface
 
         
 
-        if($currentUser->getRoles() != PermissionRoles::SUPER_ADMIN)
+        if($currentRole != PermissionRoles::SUPER_ADMIN)
         {
-            if (PermissionRoles::SUPER_ADMIN != $data->getUserRoles()) 
+            if (PermissionRoles::SUPER_ADMIN != $dataRole) 
             { 
                $data->addSupervisor($currentUser);
             }else{
                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can not Change Super Admin Attributes");
             }
         }
-
-        if($currentUser->getRoles() == PermissionRoles::OWNER)
+        if($currentRole === PermissionRoles::OWNER)
         {
             
-            if ($data->getRoles() != PermissionRoles::AGENCY_ADMIN || $data->getRoles() != PermissionRoles::AGENCY_CASHIER)
+            if ($dataRole != PermissionRoles::AGENCY_ADMIN && $dataRole != PermissionRoles::AGENCY_CASHIER)
             {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier");
-                
+                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create admin or agency cashier for your account");
             }
+
+           
+
+        }else{
+
+            if ($dataRole === PermissionRoles::AGENCY_ADMIN || $dataRole == PermissionRoles::AGENCY_CASHIER)
+            {
+                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create system users");
+                
+            } 
         }
+
+       
 
         $data->setPassword($this->encoder->encodePassword($data, $password));
         $data->eraseCredentials();
