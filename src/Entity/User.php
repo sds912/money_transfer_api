@@ -1,12 +1,7 @@
 <?php
 
 namespace App\Entity;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -21,11 +16,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
- * @ApiFilter(BooleanFilter::class, properties={"isActive"})
  * 
  */
 class User implements UserInterface
 {
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -143,7 +138,6 @@ class User implements UserInterface
      * @Groups({
      *  "user.write"
      * })
-     * @ApiSubresource()
      */
     private $supervisor;
 
@@ -152,7 +146,6 @@ class User implements UserInterface
      * @Groups({
      *  "user.write"
      * })
-     * @ApiSubresource()
      */
     private $supervisorUsers;
 
@@ -162,8 +155,6 @@ class User implements UserInterface
      *  "user.read",
      *  "user.write"
      * })
-     * @ApiSubresource()
-     * 
      */
     private $userRoles;
 
@@ -171,28 +162,32 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="owner")
      * @Groups({
      *  "user.write",
+     *  "user.read"
      * })
-     * @ApiSubresource()
      */
     private $owner_agencies;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Agency", inversedBy="cashiers")
-     * @Groups({
-     *  "user.write",
-     * })
-     * @ApiSubresource()
      */
     private $cashier_agency;
 
-  
-  
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="agency_admin")
+     * })
+     */
+    private $admin_agencies;
+
+
+
+    
 
     public function __construct()
     {
         $this->supervisor = new ArrayCollection();
         $this->supervisorUsers = new ArrayCollection();
         $this->owner_agencies = new ArrayCollection();
+        $this->admin_agencies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -450,7 +445,6 @@ class User implements UserInterface
     {
         if ($this->owner_agencies->contains($ownerAgency)) {
             $this->owner_agencies->removeElement($ownerAgency);
-            // set the owning side to null (unless already changed)
             if ($ownerAgency->getOwner() === $this) {
                 $ownerAgency->setOwner(null);
             }
@@ -471,10 +465,37 @@ class User implements UserInterface
         return $this;
     }
 
-    
+    /**
+     * @return Collection|Agency[]
+     */
+    public function getAdminAgencies(): Collection
+    {
+        return $this->admin_agencies;
+    }
 
+    public function addAdminAgency(Agency $adminAgency): self
+    {
+        if (!$this->admin_agencies->contains($adminAgency)) {
+            $this->admin_agencies[] = $adminAgency;
+            $adminAgency->setAgencyAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdminAgency(Agency $adminAgency): self
+    {
+        if ($this->admin_agencies->contains($adminAgency)) {
+            $this->admin_agencies->removeElement($adminAgency);
+            // set the owning side to null (unless already changed)
+            if ($adminAgency->getAgencyAdmin() === $this) {
+                $adminAgency->setAgencyAdmin(null);
+            }
+        }
+
+        return $this;
+    }
 
    
-   
-    
+ 
 }

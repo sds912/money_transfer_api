@@ -4,15 +4,12 @@ namespace App\DataPersister;
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use App\Entity\Agency;
-use App\Entity\Roles;
 use App\PermissionRoles;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use stdClass;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -29,8 +26,7 @@ class UserDataPersister implements DataPersisterInterface
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $encoder,
         Security $security,
-        RequestStack $request,
-        EntityManagerInterface $entity)
+        RequestStack $request)
     {
         $this->entityManager = $entityManager;
         $this->security = $security;
@@ -48,10 +44,6 @@ class UserDataPersister implements DataPersisterInterface
      */
     public function persist($data)
     {
-
-        
-
-    
 
         $currentUser = $this->security->getUser();
         $password = $data->getUsername();
@@ -86,9 +78,6 @@ class UserDataPersister implements DataPersisterInterface
     
         }
 
-
-        
-
         if($currentRole != PermissionRoles::SUPER_ADMIN)
         {
             if (PermissionRoles::SUPER_ADMIN != $dataRole) 
@@ -105,7 +94,7 @@ class UserDataPersister implements DataPersisterInterface
                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create admin or agency cashier for your account");
             }
         }else{
-            
+
             if ($dataRole === PermissionRoles::AGENCY_ADMIN || $dataRole == PermissionRoles::AGENCY_CASHIER)
             {
                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create system users");
@@ -116,15 +105,15 @@ class UserDataPersister implements DataPersisterInterface
 
         $data->setPassword($this->encoder->encodePassword($data, $password));
         $data->eraseCredentials();
-    
+
         $this->entityManager->persist($data);
         $this->entityManager->flush();
     } 
 
-   public function remove($data)
-   {
-    $this->entityManager->remove($data);
-    $this->entityManager->flush();
-   }
+    public function remove($data)
+    {
+        $this->entityManager->remove($data);
+        $this->entityManager->flush();
+    }
 
 }

@@ -3,7 +3,8 @@ api_platform:
         paths: ['%kernel.project_dir%/config/api_platform']
     title: MONEY TRANSFER API PLATFORM
     patch_formats:
-        json: ['application/merge-patch+json']
+        json:   ['application/json']
+        jsonld: ['application/ld+js']
     swagger:
         versions: [3]
         api_keys:
@@ -13,5 +14,5 @@ api_platform:
 
     collection:
         pagination:
-            items_per_page: 10
+            items_per_page: 5
             client_items_per_page: true

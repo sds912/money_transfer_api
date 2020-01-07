@@ -13,8 +13,48 @@ resources:
       get: ~
       put: ~
       delete: ~
-  
 
+  App\Entity\User: 
+    attributes:
+      denormalization_context:
+        groups: ['user.write']
+      normalization_context: 
+        groups: ['user.read']
+      
+
+    collectionOperations:
+      post:
+        method: 'POST' 
+        security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
+        security_message: 'Only admin or partner add  user'
+      get: 
+        method: 'GET'
+        security: 'is_granted("ROLE_ADMIN")'
+        security_message: 'Only admin access these resources'
+        
+    itemOperations:
+      get:
+        method: 'GET'
+        security: 'is_granted("ROLE_ADMIN")'
+        security_message: 'Only admin access this resource'
+
+      partner_block: 
+        security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
+        security_message: 'Only admin or partner can block user'
+        method: 'PUT'
+        path: '/users/{id}/block'
+        requirements:
+          id: '\d+'
+    
+      partner_account:
+        method: 'GET'
+        security: 'is_granted("ROLE_AGENCY_OWNER") and object == user'
+        security_message: 'Only owner can access to this account'
+        path: '/users/{id}/account'
+        #controller: App\Controller\PartnerAccount
+        requirements:
+          id: '\d+'
+          
   App\Entity\Agency: 
     attributes:
       normalization_context:
@@ -28,54 +68,7 @@ resources:
     itemOperations:
       get: ~
       put: ~
-      update_user:
-        method: 'PUT'
-        security: 'is_granted("ROLE_AGENCY_OWNER") and object.getOwner() == user'
-        security_message: 'Only Owner can manage Agency resouces'
-        path: '/agencies/{id}/users'
-        #controller: App\Controller\PartnerAccount
-        requirements:
-          id: '\d+'
-        
-
-      delete: ~
-  
-
-  App\Entity\User: 
-    attributes:
-      denormalization_context:
-        groups: ['user.write']
-      normalization_context: 
-        groups: ['user.read']
-      security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
-
-    collectionOperations:
-      post:
-        method: 'POST' 
-      get: 
-        method: 'GET'
-        
-    itemOperations:
-      get:
-        method: 'GET'
-      put: 
-        security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
-        security_message: 'Only Admin can block user'
-        method: 'PUT'
-        path: '/users/{id}/block'
-        requirements:
-          id: '\d+'
-    
-      get_account:
-        method: 'GET'
-        security: 'is_granted("ROLE_AGENCY_OWNER") and object == user'
-        security_message: 'Only Owner can access to this account'
-        path: '/users/{id}/account'
-        #controller: App\Controller\PartnerAccount
-        requirements:
-          id: '\d+'
-        
-
+ 
      
 
  

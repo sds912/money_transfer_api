@@ -13,12 +13,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\AgencyRepository")
  * @UniqueEntity(fields={"code"})
  */
 class Agency
 {
+    
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -75,20 +75,28 @@ class Agency
     private $isActive = true;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="admin_agencies")
+     * @Groups({"agency.write","agency.read"})
+     */
+    private $agency_admin;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="owner_agencies")
-     * @Groups({"agency.write"})
+     * @Groups({"agency.write","agency.read"})
      */
     private $owner;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="cashier_agency")
-     * @Groups({"agency.write"})
+     * @Groups({"agency.write","agency.read"})
      */
     private $cashiers;
 
     
 
-    
+   
+
+
 
     public function __construct()
     {
@@ -226,6 +234,21 @@ class Agency
         return $this;
     }
 
+    public function getAgencyAdmin(): ?User
+    {
+        return $this->agency_admin;
+    }
+
+    public function setAgencyAdmin(?User $agency_admin): self
+    {
+        $this->agency_admin = $agency_admin;
+
+        return $this;
+    }
+
+   
+
+    
 
   
 }
