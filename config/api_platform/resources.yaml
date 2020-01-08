@@ -39,6 +39,10 @@ resources:
         security_message: 'Only admin access this resource'
 
       partner_block: 
+        denormalization_context: 
+          groups: ['block.update']
+        normalization_context:
+          groups: ['block.read']
         security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
         security_message: 'Only admin or partner can block user'
         method: 'PUT'
@@ -51,7 +55,6 @@ resources:
       normalization_context:
         groups: ['agency.read']
       denormalization_context:
-        api_allow_update: true
         groups: ['agency.write']
     collectionOperations:
       post: ~

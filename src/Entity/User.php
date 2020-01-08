@@ -37,7 +37,9 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({
      * "user.read", 
-     * "user.write"
+     * "user.write",
+     * "block.update",
+     * "block.read"
      * })
      * @Assert\NotBlank()
      */
@@ -107,7 +109,9 @@ class User implements UserInterface
      * @ORM\Column(type="boolean", options={"default" : true})
      * @Groups({
      *  "user.write",
-     *  "user.read"
+     *  "user.read",
+     *   "block.update",
+     *   "block.read"
      * })
      * @Assert\Type("bool")
      */
