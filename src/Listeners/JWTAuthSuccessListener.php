@@ -40,8 +40,9 @@ class JWTAuthSuccessListener {
     if(is_null($user) === false){
 
        $response->setStatusCode(Response::HTTP_LOCKED);
-       $data['token'] = null;
-       $data['message'] = "you has been blocked";
+       
+       unset($data['token']);
+       $data['message'] = "You has been blocked. Contact your supervisor for more informations";
     }
 
         $event->setData($data);

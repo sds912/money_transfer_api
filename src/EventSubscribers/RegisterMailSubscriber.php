@@ -28,6 +28,8 @@ final class RegisterMailSubscriber implements EventSubscriberInterface
 
     public function sendMail(ViewEvent $event)
     {
+
+        
         $user = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
@@ -36,10 +38,12 @@ final class RegisterMailSubscriber implements EventSubscriberInterface
         }
 
         $message = (new \Swift_Message('Your account has been created successfully'))
-            ->setFrom('system@example.com')
-            ->setTo('contact@les-tilleuls.coop')
+            ->setFrom('senghor.pape912@hotmail.com')
+            ->setTo('senghor.pape912@hotmail.com')
             ->setBody(sprintf('login: '.$user->getUsername().'password:'.$user->getPassword()));
 
         $this->mailer->send($message);
+
+        
     }
 }

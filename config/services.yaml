@@ -34,7 +34,12 @@ services:
     App\Listeners\JWTAuthSuccessListener:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccess}
-    
+
+    Aacme_api.event.jwt_created_listener:
+        class: App\Listeners\JWTCreatedListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+
     'App\DataProvider\AccountDataProvider': ~
         # Uncomment only if autoconfiguration is disabled
         #tags: [ 'api_platform.item_data_provider' ]
