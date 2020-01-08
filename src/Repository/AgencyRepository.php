@@ -49,5 +49,12 @@ class AgencyRepository extends ServiceEntityRepository
     }
     */
 
+    public function findNumberOfAgencies(): ? int{
+        return $this->createQueryBuilder('a')
+            ->select('count(a.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     
 }

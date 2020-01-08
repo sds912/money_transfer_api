@@ -45,16 +45,7 @@ resources:
         path: '/users/{id}/block'
         requirements:
           id: '\d+'
-    
-      partner_account:
-        method: 'GET'
-        security: 'is_granted("ROLE_AGENCY_OWNER") and object == user'
-        security_message: 'Only owner can access to this account'
-        path: '/users/{id}/account'
-        #controller: App\Controller\PartnerAccount
-        requirements:
-          id: '\d+'
-          
+        
   App\Entity\Agency: 
     attributes:
       normalization_context:
@@ -68,6 +59,9 @@ resources:
     itemOperations:
       get: ~
       put: ~
+
+
+      
  
      
 
