@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,6 +37,16 @@ class PartnerAccount
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partnerAccounts")
      */
     private $owner;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="account")
+     */
+    private $deposits;
+
+    public function __construct()
+    {
+        $this->deposits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -85,6 +97,37 @@ class PartnerAccount
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Deposit[]
+     */
+    public function getDeposits(): Collection
+    {
+        return $this->deposits;
+    }
+
+    public function addDeposit(Deposit $deposit): self
+    {
+        if (!$this->deposits->contains($deposit)) {
+            $this->deposits[] = $deposit;
+            $deposit->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeposit(Deposit $deposit): self
+    {
+        if ($this->deposits->contains($deposit)) {
+            $this->deposits->removeElement($deposit);
+            // set the owning side to null (unless already changed)
+            if ($deposit->getAccount() === $this) {
+                $deposit->setAccount(null);
+            }
+        }
 
         return $this;
     }

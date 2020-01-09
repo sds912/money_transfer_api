@@ -177,6 +177,11 @@ class User implements UserInterface
      */
     private $RC;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="creator")
+     */
+    private $creator_deposits;
+
     
     public function __construct()
     {
@@ -185,6 +190,7 @@ class User implements UserInterface
         $this->owner_agencies = new ArrayCollection();
         $this->admin_agencies = new ArrayCollection();
         $this->partnerAccounts = new ArrayCollection();
+        $this->creator_deposits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -471,6 +477,37 @@ class User implements UserInterface
     public function setRC(string $RC): self
     {
         $this->RC = $RC;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Deposit[]
+     */
+    public function getCreatorDeposits(): Collection
+    {
+        return $this->creator_deposits;
+    }
+
+    public function addCreatorDeposit(Deposit $creatorDeposit): self
+    {
+        if (!$this->creator_deposits->contains($creatorDeposit)) {
+            $this->creator_deposits[] = $creatorDeposit;
+            $creatorDeposit->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatorDeposit(Deposit $creatorDeposit): self
+    {
+        if ($this->creator_deposits->contains($creatorDeposit)) {
+            $this->creator_deposits->removeElement($creatorDeposit);
+            // set the owning side to null (unless already changed)
+            if ($creatorDeposit->getCreator() === $this) {
+                $creatorDeposit->setCreator(null);
+            }
+        }
 
         return $this;
     }
