@@ -50,18 +50,25 @@ resources:
         requirements:
           id: '\d+'
         
-  App\Entity\Agency: 
+  App\Entity\PartnerAccount: 
     attributes:
       normalization_context:
-        groups: ['agency.read']
+        groups: ['account.read']
       denormalization_context:
-        groups: ['agency.write']
+        groups: ['account.write']
     collectionOperations:
-      post: ~
-      get: ~
+      post: 
+        path: '/partners/accounts'
+      get: 
+        path:
+          '/partners/accounts'
     itemOperations:
-      get: ~
-      put: ~
+      get: 
+        path:
+          '/partners/accounts/{id}'
+      put: 
+        path:
+          '/partners/accounts/{id}'
 
 
       

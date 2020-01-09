@@ -167,6 +167,16 @@ class User implements UserInterface
      */
     private $partnerAccounts;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $Ninea;
+
+    /**
+     * @ORM\Column(type="string", length=15)
+     */
+    private $RC;
+
     
     public function __construct()
     {
@@ -437,6 +447,30 @@ class User implements UserInterface
                 $partnerAccount->setOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNinea(): ?int
+    {
+        return $this->Ninea;
+    }
+
+    public function setNinea(int $Ninea): self
+    {
+        $this->Ninea = $Ninea;
+
+        return $this;
+    }
+
+    public function getRC(): ?string
+    {
+        return $this->RC;
+    }
+
+    public function setRC(string $RC): self
+    {
+        $this->RC = $RC;
 
         return $this;
     }
