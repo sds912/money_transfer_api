@@ -163,35 +163,18 @@ class User implements UserInterface
     private $userRoles;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="owner")
-     * @Groups({
-     *  "user.write",
-     *  "user.read"
-     * })
+     * @ORM\OneToMany(targetEntity="App\Entity\PartnerAccount", mappedBy="owner")
      */
-    private $owner_agencies;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Agency", inversedBy="cashiers")
-     */
-    private $cashier_agency;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Agency", mappedBy="agency_admin")
-     * })
-     */
-    private $admin_agencies;
-
-
+    private $partnerAccounts;
 
     
-
     public function __construct()
     {
         $this->supervisor = new ArrayCollection();
         $this->supervisorUsers = new ArrayCollection();
         $this->owner_agencies = new ArrayCollection();
         $this->admin_agencies = new ArrayCollection();
+        $this->partnerAccounts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -428,78 +411,37 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection|Agency[]
+     * @return Collection|PartnerAccount[]
      */
-    public function getOwnerAgencies(): Collection
+    public function getPartnerAccounts(): Collection
     {
-        return $this->owner_agencies;
+        return $this->partnerAccounts;
     }
 
-    public function addOwnerAgency(Agency $ownerAgency): self
+    public function addPartnerAccount(PartnerAccount $partnerAccount): self
     {
-        if (!$this->owner_agencies->contains($ownerAgency)) {
-            $this->owner_agencies[] = $ownerAgency;
-            $ownerAgency->setOwner($this);
+        if (!$this->partnerAccounts->contains($partnerAccount)) {
+            $this->partnerAccounts[] = $partnerAccount;
+            $partnerAccount->setOwner($this);
         }
 
         return $this;
     }
 
-    public function removeOwnerAgency(Agency $ownerAgency): self
+    public function removePartnerAccount(PartnerAccount $partnerAccount): self
     {
-        if ($this->owner_agencies->contains($ownerAgency)) {
-            $this->owner_agencies->removeElement($ownerAgency);
-            if ($ownerAgency->getOwner() === $this) {
-                $ownerAgency->setOwner(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getCashierAgency(): ?Agency
-    {
-        return $this->cashier_agency;
-    }
-
-    public function setCashierAgency(?Agency $cashier_agency): self
-    {
-        $this->cashier_agency = $cashier_agency;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Agency[]
-     */
-    public function getAdminAgencies(): Collection
-    {
-        return $this->admin_agencies;
-    }
-
-    public function addAdminAgency(Agency $adminAgency): self
-    {
-        if (!$this->admin_agencies->contains($adminAgency)) {
-            $this->admin_agencies[] = $adminAgency;
-            $adminAgency->setAgencyAdmin($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAdminAgency(Agency $adminAgency): self
-    {
-        if ($this->admin_agencies->contains($adminAgency)) {
-            $this->admin_agencies->removeElement($adminAgency);
+        if ($this->partnerAccounts->contains($partnerAccount)) {
+            $this->partnerAccounts->removeElement($partnerAccount);
             // set the owning side to null (unless already changed)
-            if ($adminAgency->getAgencyAdmin() === $this) {
-                $adminAgency->setAgencyAdmin(null);
+            if ($partnerAccount->getOwner() === $this) {
+                $partnerAccount->setOwner(null);
             }
         }
 
         return $this;
     }
 
+    
    
  
 }

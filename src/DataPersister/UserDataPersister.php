@@ -91,7 +91,7 @@ class UserDataPersister implements DataPersisterInterface
         { 
             if ($dataRole != PermissionRoles::AGENCY_ADMIN && $dataRole != PermissionRoles::AGENCY_CASHIER)
             {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create admin or agency cashier for your account");
+                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier for your account");
             }
         }else{
 

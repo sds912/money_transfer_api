@@ -30,7 +30,7 @@ resources:
       get: 
         method: 'GET'
         security: 'is_granted("ROLE_ADMIN")'
-        security_message: 'Only admin access these resources'
+        security_message: 'Only admin can access these resources'
         
     itemOperations:
       get:

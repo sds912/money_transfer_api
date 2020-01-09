@@ -12,4 +12,4 @@ easy_admin:
   entities:
     - App\Entity\User
     - App\Entity\Roles
-    - App\Entity\Agency
+    - App\Entity\PartnerAccount
