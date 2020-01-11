@@ -70,6 +70,9 @@ resources:
         path:
           '/partners/accounts/{id}'
 
+  App\Entity\Deposit: ~
+
+
 
       
  

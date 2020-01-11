@@ -47,3 +47,7 @@ services:
     'App\DataProvider\AccountDataProvider': ~
         # Uncomment only if autoconfiguration is disabled
         #tags: [ 'api_platform.item_data_provider' ]
+
+    'App\Utils\AccountNumberGenerator': ~
+
+

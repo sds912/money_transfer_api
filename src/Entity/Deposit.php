@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -17,12 +19,13 @@ class Deposit
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $amount;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\DateTime
      */
     private $created_at;
 
@@ -35,6 +38,11 @@ class Deposit
      * @ORM\ManyToOne(targetEntity="App\Entity\PartnerAccount", inversedBy="deposits")
      */
     private $account;
+
+    public function __construct()
+    {
+        $this->setCreatedAt(new \DateTime('now'));
+    }
 
     public function getId(): ?int
     {

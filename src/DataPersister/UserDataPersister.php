@@ -57,10 +57,10 @@ class UserDataPersister implements DataPersisterInterface
         {
             if($dataRole == PermissionRoles::OWNER)
             {
-                $agencies = $this->entityManager->getRepository(Agency::class)->findBy(['owner'=>$data]);
-                foreach ($agencies as $agency) {
-                   $agency->setIsActive(!$agency->getIsActive());
-                   $this->entityManager->persist($agency);
+                $users = $this->entityManager->getRepository(User::class)->findBy(['supervisor'=>$data]);
+                foreach ($users as $user) {
+                   $user->setIsActive(false);
+                   $this->entityManager->persist($user);
                 }
             }
 

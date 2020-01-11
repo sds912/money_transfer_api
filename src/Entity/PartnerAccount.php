@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use DateTime;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,37 +17,52 @@ class PartnerAccount
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"account.write", "account.read"})
      */
     private $id;
 
-    /**
+     /**
      * @ORM\Column(type="integer")
+     * @Groups({"account.write", "account.read"})
      */
-    private $account_number;
+    private $accountNumber = 0;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"account.write", "account.read"})
      */
-    private $balance;
+    private $balance = 0;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"account.write", "account.read"})
      */
     private $created_at;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partnerAccounts")
+     * @Groups({"account.write", "account.read"})
      */
     private $owner;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="account")
+     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="account", cascade={"persist"})
+     * @Groups({"account.write", "account.read"})
      */
     private $deposits;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="creatorAccounts")
+     */
+    private $creator;
+
+  
+
     public function __construct()
     {
+        
         $this->deposits = new ArrayCollection();
+        $this->setCreatedAt(new \DateTime('now'));
     }
 
     public function getId(): ?int
@@ -53,17 +70,7 @@ class PartnerAccount
         return $this->id;
     }
 
-    public function getAccountNumber(): ?int
-    {
-        return $this->account_number;
-    }
-
-    public function setAccountNumber(int $account_number): self
-    {
-        $this->account_number = $account_number;
-
-        return $this;
-    }
+    
 
     public function getBalance(): ?int
     {
@@ -128,6 +135,30 @@ class PartnerAccount
                 $deposit->setAccount(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAccountNumber(): ?int
+    {
+        return $this->accountNumber;
+    }
+
+    public function setAccountNumber(int $accountNumber): self
+    {
+        $this->accountNumber = $accountNumber;
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(?User $creator): self
+    {
+        $this->creator = $creator;
 
         return $this;
     }
