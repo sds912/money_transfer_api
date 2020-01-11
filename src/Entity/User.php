@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,6 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
+ * @ApiFilter(SearchFilter::class, properties={"Ninea": "exact"})
  * 
  */
 class User implements UserInterface

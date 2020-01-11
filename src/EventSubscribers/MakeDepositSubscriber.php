@@ -54,7 +54,7 @@ final class MakeDepositSubscriber implements EventSubscriberInterface
 
         $deposit->setCreator($currentUser);
 
-        $deposit->getAccount()->setBalance($deposit->getAmount());
+        $deposit->getAccount()->setBalance($deposit->getAccount()->getBalance() + $deposit->getAmount());
        
         
     }

@@ -96,4 +96,9 @@ class Deposit
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->account->getOwner()->getLname();
+    }
 }

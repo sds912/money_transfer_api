@@ -22,7 +22,7 @@ class PartnerAccount
     private $id;
 
      /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      * @Groups({"account.write", "account.read"})
      */
     private $accountNumber = 0;
@@ -161,5 +161,10 @@ class PartnerAccount
         $this->creator = $creator;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->accountNumber;
     }
 }
