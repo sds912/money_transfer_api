@@ -35,7 +35,7 @@ class Deposit
     private $creator;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PartnerAccount", inversedBy="deposits")
+     * @ORM\ManyToOne(targetEntity="App\Entity\PartnerAccount", inversedBy="deposits", cascade={"persist"})
      */
     private $account;
 
