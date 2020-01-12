@@ -9,14 +9,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Twig\Environment;
 
 final class RegisterMailSubscriber implements EventSubscriberInterface
 {
     private $mailer;
+    private $twig;
 
-    public function __construct(\Swift_Mailer $mailer)
+    public function __construct(
+        \Swift_Mailer $mailer, 
+        Environment $twig)
     {
         $this->mailer = $mailer;
+        $this->twig = $twig;
     }
 
     public static function getSubscribedEvents()
@@ -40,7 +46,9 @@ final class RegisterMailSubscriber implements EventSubscriberInterface
         $message = (new \Swift_Message('Your account has been created successfully'))
             ->setFrom('senghor.pape912@hotmail.com')
             ->setTo('senghor.pape912@hotmail.com')
-            ->setBody(sprintf('login: '.$user->getUsername().'password:'.$user->getPassword()));
+            ->setBody($this->twig->render('accountValidation.html.twig',[
+                'user' => $user
+            ]));
 
         $this->mailer->send($message);
 

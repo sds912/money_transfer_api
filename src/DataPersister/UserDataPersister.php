@@ -3,7 +3,6 @@ namespace App\DataPersister;
 
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use App\Entity\Agency;
 use App\PermissionRoles;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,62 +49,67 @@ class UserDataPersister implements DataPersisterInterface
         $currentRole = $currentUser->getRoles()[0];
         $dataRole = $data->getUserRoles()->getRoleName();
         
-    
-       $uri = $this->request->getCurrentRequest()->getPathInfo(); 
-       $pattern = '/\/api\/users\/\d+\/block/';
-        if(preg_match($pattern,$uri))
-        {
-            if($dataRole == PermissionRoles::OWNER)
-            {
-                $users = $this->entityManager->getRepository(User::class)->findBy(['supervisor'=>$data]);
-                foreach ($users as $user) {
-                   $user->setIsActive(false);
-                   $this->entityManager->persist($user);
-                }
-            }
-
-            if($currentRole === PermissionRoles::OWNER)
-            {
-              $owner = $this->entityManager->getRepository(User::class)->findOneBY(['username'=>$currentUser->getUsername()]);
-              $user = $this->entityManager->getRepository(User::class)->findOneBy(['username'=>$data->getUsername()]);
-
-              if($user->getSupervisor()[0] != $owner)
-              {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You cann't manage this user");
-              }
-              
-            }
-    
-        }
-
-        if($currentRole != PermissionRoles::SUPER_ADMIN)
-        {
-            if (PermissionRoles::SUPER_ADMIN != $dataRole) 
-            { 
-               $data->addSupervisor($currentUser);
-            }else{
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can not Change Super Admin Attributes");
-            }
-        }
-        if($currentRole === PermissionRoles::OWNER)
-        { 
-            if ($dataRole != PermissionRoles::AGENCY_ADMIN && $dataRole != PermissionRoles::AGENCY_CASHIER)
-            {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier for your account");
-            }
-        }else{
-
-            if ($dataRole === PermissionRoles::AGENCY_ADMIN || $dataRole == PermissionRoles::AGENCY_CASHIER)
-            {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create system users");
-            } 
-        }
-
-       
-
         $data->setPassword($this->encoder->encodePassword($data, $password));
         $data->eraseCredentials();
 
+
+
+        $currentUser = $this->security->getUser();
+        $password = $data->getUsername();
+        $currentRole = $currentUser->getRoles()[0];
+        $dataRole = $data->getUserRoles()->getRoleName();
+       
+
+        $uri = $this->request->getCurrentRequest()->getPathInfo(); 
+        $pattern = '/\/api\/users\/\d+\/block/';
+         if(preg_match($pattern,$uri))
+         {
+             if($dataRole == PermissionRoles::OWNER)
+             {
+                 $ownerEmployers = $this->entityManager->getRepository(User::class)->findBy(['supervisor'=>$data]);
+                 foreach ($ownerEmployers as $employer) {
+                    $employer->setIsActive(false);
+                    $this->entityManager->persist($employer);
+                 }
+             }
+ 
+             if($currentRole === PermissionRoles::OWNER)
+             {
+               $owner = $this->entityManager->getRepository(User::class)->findOneBY(['username'=>$currentUser->getUsername()]);
+               $employer = $this->entityManager->getRepository(User::class)->findOneBy(['username'=>$data->getUsername()]);
+ 
+               if($employer->getSupervisor()[0] != $owner)
+               {
+                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You cann't manage this user");
+               }
+               
+             }
+     
+         }
+ 
+         if($currentRole != PermissionRoles::SUPER_ADMIN)
+         {
+             if (PermissionRoles::SUPER_ADMIN != $dataRole) 
+             { 
+                $data->addSupervisor($currentUser);
+             }else{
+                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can not Change Super Admin Attributes");
+             }
+         }
+         if($currentRole === PermissionRoles::OWNER)
+         { 
+             if ($dataRole != PermissionRoles::AGENCY_ADMIN && $dataRole != PermissionRoles::AGENCY_CASHIER)
+             {
+                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier for your account");
+             }
+         }else{
+ 
+             if ($dataRole === PermissionRoles::AGENCY_ADMIN || $dataRole == PermissionRoles::AGENCY_CASHIER)
+             {
+                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create system users");
+             } 
+         }
+ 
         $this->entityManager->persist($data);
         $this->entityManager->flush();
     } 
