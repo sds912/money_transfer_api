@@ -6,6 +6,7 @@ use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Entity\PartnerAccount;
 use App\Entity\User;
 use App\Utils\AccountNumberGenerator;
+use App\Utils\ContractGenerator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -15,15 +16,18 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 final class CreateAccountSubscriber implements EventSubscriberInterface
 {
    private $tokenStorage;
-   private $generator;
+   private $accountNumberGenerator;
+   private $contractGenerator;
 
     public function __construct(
        TokenStorageInterface $tokenStorage,
-       AccountNumberGenerator $generator
+       AccountNumberGenerator $accountNumberGenerator,
+       ContractGenerator $contractGenerator
        )
     {
        $this->tokenStorage = $tokenStorage;
-       $this->generator = $generator;
+       $this->accountNumberGenerator = $accountNumberGenerator;
+       $this->contractGenerator = $contractGenerator;
     }
 
     public static function getSubscribedEvents()
@@ -51,8 +55,10 @@ final class CreateAccountSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $account->setAccountNumber($this->generator->generate());
+        $account->setAccountNumber($this->accountNumberGenerator->generate());
         $account->setCreator($currentUser);
+
+        $this->contractGenerator->generate($account->getOwner(), $account, $currentUser);
 
      
 

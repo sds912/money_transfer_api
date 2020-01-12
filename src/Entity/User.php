@@ -2,13 +2,17 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,7 +22,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
- * @ApiFilter(SearchFilter::class, properties={"Ninea": "exact"})
+ * @ApiFilter(BooleanFilter::class, properties={"isActive"})
  * 
  */
 class User implements UserInterface
@@ -171,14 +175,22 @@ class User implements UserInterface
     private $partnerAccounts;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({
+     *  "user.read",
+     *  "user.write"
+     * })
      */
-    private $Ninea;
+    private $ninea;
 
     /**
-     * @ORM\Column(type="string", length=15)
+     * @ORM\Column(type="string", length=15, nullable=true)
+     * @Groups({
+     *  "user.read",
+     *  "user.write"
+     * })
      */
-    private $RC;
+    private $rc;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="creator")
@@ -468,24 +480,24 @@ class User implements UserInterface
 
     public function getNinea(): ?int
     {
-        return $this->Ninea;
+        return $this->ninea;
     }
 
-    public function setNinea(int $Ninea): self
+    public function setNinea(int $ninea): self
     {
-        $this->Ninea = $Ninea;
+        $this->ninea = $ninea;
 
         return $this;
     }
 
-    public function getRC(): ?string
+    public function getRc(): ?string
     {
-        return $this->RC;
+        return $this->rc;
     }
 
-    public function setRC(string $RC): self
+    public function setRc(string $rc): self
     {
-        $this->RC = $RC;
+        $this->rc = $rc;
 
         return $this;
     }

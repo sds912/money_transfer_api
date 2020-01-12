@@ -20,8 +20,6 @@ resources:
         groups: ['user.write']
       normalization_context: 
         groups: ['user.read']
-      
-
     collectionOperations:
       post:
         method: 'POST' 
