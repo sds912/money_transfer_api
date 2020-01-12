@@ -16,6 +16,8 @@ resources:
 
   App\Entity\User: 
     attributes:
+      filters: ["users.search_filter"]
+
       denormalization_context:
         groups: ['user.write']
       normalization_context: 

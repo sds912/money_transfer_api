@@ -50,4 +50,12 @@ services:
 
     'App\Utils\AccountNumberGenerator': ~
 
+    users.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { ninea: 'exact', isActibe: 'exact', country: 'partial', city: 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'users.search_filter' } ]
+        autowire: false
+        autoconfigure: false
+        public: false
+
    

@@ -16,3 +16,11 @@ api_platform:
         pagination:
             items_per_page: 100
             client_items_per_page: true
+
+    eager_loading:
+
+        enabled: true
+
+        fetch_partial: false
+
+        max_joins: 30
