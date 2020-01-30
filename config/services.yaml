@@ -8,6 +8,7 @@ parameters:
     availableLocales:
         - en
         - fr
+    
     jwt_key_pass_phrase: ~
 
 services:

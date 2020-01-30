@@ -84,6 +84,15 @@ class UserDataPersister implements DataPersisterInterface
                }
                
              }
+
+             if($currentRole === PermissionRoles::ADMIN)
+             {
+                 if($dataRole === PermissionRoles::ADMIN)
+                 {
+                    throw new HttpException(Response::HTTP_UNAUTHORIZED, "You cann't block admin");
+                    
+                 }
+             }
      
          }
  
@@ -108,6 +117,22 @@ class UserDataPersister implements DataPersisterInterface
              {
                  throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create system users");
              } 
+         }
+
+
+         if($dataRole === PermissionRoles::OWNER)
+         {
+             if(is_null($data->getNinea()) || $data->getNinea() === "")
+             {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, "Partner should have valid Ninea");
+               
+             }
+
+             if(is_null($data->getRc()) || $data->getRc() === "")
+             {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, "Patner sholud have valid Rc");
+                 
+             }
          }
  
         $this->entityManager->persist($data);

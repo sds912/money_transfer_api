@@ -18,12 +18,15 @@ class JWTAuthSuccessListener {
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        RequestStack $request)
+        RequestStack $request
+        )
     {
         $this->loginInfos  = json_decode($request->getCurrentRequest()->getContent());
         $this->entityManager = $entityManager;
+
     }
     
+
  
     /**
      * @param AuthenticationSuccessEvent $event
@@ -40,8 +43,9 @@ class JWTAuthSuccessListener {
     if(is_null($user) === false){
 
        $response->setStatusCode(Response::HTTP_LOCKED);
-       
+
        unset($data['token']);
+
        $data['message'] = "You has been blocked. Contact your supervisor for more informations";
     }
 

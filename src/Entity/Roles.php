@@ -17,12 +17,13 @@ class Roles
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("role.read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"role.write"})
+     * @Groups({"role.write","role.read"})
      */
     private $role_name;
 
