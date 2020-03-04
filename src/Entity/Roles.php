@@ -17,21 +17,27 @@ class Roles
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("role.read")
+     * @Groups({"role.read","user.read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"role.write","role.read"})
+     * @Groups({"role.write","role.read","user.read"})
      */
-    private $role_name;
+    private $roleName;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="userRoles")
-     * @Groups("role.read")
+     * 
      */
     private $users;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"role.write","role.read","user.read"})
+     */
+    private $description;
 
     public function __construct()
     {
@@ -45,12 +51,12 @@ class Roles
 
     public function getRoleName(): ?string
     {
-        return $this->role_name;
+        return $this->roleName;
     }
 
-    public function setRoleName(string $role_name): self
+    public function setRoleName(string $roleName): self
     {
-        $this->role_name = $role_name;
+        $this->roleName = $roleName;
 
         return $this;
     }
@@ -89,6 +95,18 @@ class Roles
 
     public function __toString()
     {
-        return $this->role_name;
+        return $this->roleName;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
     }
 }

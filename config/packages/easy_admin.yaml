@@ -12,5 +12,7 @@ easy_admin:
   entities:
     - App\Entity\User
     - App\Entity\Roles
+    - App\Entity\Partner
     - App\Entity\PartnerAccount
     - App\Entity\Deposit
+

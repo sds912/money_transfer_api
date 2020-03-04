@@ -49,6 +49,14 @@ services:
         # Uncomment only if autoconfiguration is disabled
         #tags: [ 'api_platform.item_data_provider' ]
 
+    
+    App\DataProviders\RoleCollectionDataProvider:
+        tags: [{ name: 'api_platform.collection_data_provider' }]
+        arguments:
+            $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
+      # Autoconfiguration must be disabled to set a custom priority
+        autoconfigure: false
+
     'App\Utils\AccountNumberGenerator': ~
 
     users.search_filter:
@@ -58,11 +66,25 @@ services:
         autowire: false
         autoconfigure: false
         public: false
-
+    partner.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { ninea: 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'partner.search_filter' } ]
+        autowire: false
+        autoconfigure: false
+        public: false
     partner_accounts.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { accountNumber: 'exact' } ]
+        arguments: [ { accountNumber: 'exact', creator.email: 'exact' } ]
         tags:      [ { name: 'api_platform.filter', id: 'partnerAccounts.search_filter' } ]
+        autowire: false
+        autoconfigure: false
+        public: false
+
+    deposits.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ {creator.email: 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'deposits.search_filter' } ]
         autowire: false
         autoconfigure: false
         public: false

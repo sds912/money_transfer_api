@@ -20,6 +20,7 @@
         "doctrine/doctrine-fixtures-bundle": "^3.3",
         "fzaninotto/faker": "^1.9",
         "symfony/maker-bundle": "^1.14",
+        "symfony/var-dumper": "4.3.*",
         "symfony/web-server-bundle": "4.3.*"
     },
     "config": {

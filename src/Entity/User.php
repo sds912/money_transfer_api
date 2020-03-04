@@ -5,8 +5,6 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -16,11 +14,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  * @UniqueEntity(fields={"phone"})
- * @ApiFilter(SearchFilter::class, properties={"country": "exact", "isActive": "exact"})
- * 
  */
 class User implements UserInterface
 {
@@ -31,30 +26,22 @@ class User implements UserInterface
      * @ORM\Column(type="integer")
      * @Groups({
      *  "user.read",
-     *  "user.write"
+     *  "user.write",
+     * "partner.read"
      * 
      * })
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({
-     * "user.read", 
-     * "user.write",
-     * "block.update",
-     * "block.read"
-     * })
-     * @Assert\NotBlank()
-     */
-    private $username;
 
     /**
      * @var string The hashed password
      * @Groups({
-     *  "user.write"
+     *  "user.write",
+     * "partner.write"
      * }) 
      * @ORM\Column(type="string")
+     * 
      */
     private $password;
 
@@ -62,7 +49,10 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Groups({
      *  "user.write",
-     *  "user.read"
+     *  "user.read",
+     *   "partner.read",
+     *   "partner.write",
+     *   "account.read"
      * })
      * @Assert\NotBlank()
      * @Assert\Email()
@@ -73,7 +63,10 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Groups({
      *  "user.write",
-     *  "user.read"
+     *  "user.read",
+     *   "partner.read",
+     * "partner.write",
+     * "account.read"
      * })
      * @Assert\NotBlank()
      */
@@ -83,7 +76,10 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=60)
      * @Groups({
      *  "user.read",
-     *  "user.write"
+     *  "user.write",
+     *   "partner.read",
+     *   "partner.write",
+     *   "account.read"
      * })
      * @Assert\NotBlank()
      */
@@ -93,21 +89,14 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=60)
      * @Groups({
      *  "user.write",
-     *  "user.read"
+     *  "user.read",
+     *  "partner.read",
+     *  "partner.write",
+     * "account.read"
      * })
      * @Assert\NotBlank()
      */
     private $lname;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({
-     *  "user.write",
-     *  "user.read"
-     * })
-     * @Assert\NotBlank()
-     */
-    private $address;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : true})
@@ -115,32 +104,14 @@ class User implements UserInterface
      *  "user.write",
      *  "user.read",
      *   "block.update",
-     *   "block.read"
+     *   "block.read",
+     *   "partner.write",
+     *   "partner.read",
+     *   "account.read"
      * })
      * @Assert\Type("bool")
      */
     private $isActive = true;
-
-    /**
-     * @ORM\Column(type="string", length=60)
-     * @Groups({
-     *  "user.write",
-     *  "user.read"
-     * })
-     * @Assert\NotBlank()
-     */
-    private $country;
-
-    /**
-     * @ORM\Column(type="string", length=60)
-     * @Groups({
-     *  "user.write",
-     *  "user.read"
-     * })
-     * @Assert\NotBlank()
-     */
-    private $city;
-
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers")
      * @Groups({
@@ -166,49 +137,38 @@ class User implements UserInterface
      */
     private $userRoles;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PartnerAccount", mappedBy="owner")
-     */
-    private $partnerAccounts;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({
-     *  "user.read",
-     *  "user.write"
-     * })
-     */
-    private $ninea;
-
-    /**
-     * @ORM\Column(type="string", length=15, nullable=true)
-     * @Groups({
-     *  "user.read",
-     *  "user.write"
-     * })
-     */
-    private $rc;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="creator")
-     */
-    private $creator_deposits;
+    
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PartnerAccount", mappedBy="creator")
+     * @Groups({
+     *  "user.write",
+     *   "partner.read"
+     * })
      */
     private $creatorAccounts;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Partner", mappedBy="partnerCreator")
+     * @Groups({
+     *  "user.write",
+     *  "partner.write"
+     * })
+     */
+    private $partners;
+
+    /**
+     * @ORM\Column(type="blob", nullable=true)
+     */
+    private $avatar;
 
     
     public function __construct()
     {
         $this->supervisor = new ArrayCollection();
         $this->supervisorUsers = new ArrayCollection();
-        $this->owner_agencies = new ArrayCollection();
-        $this->admin_agencies = new ArrayCollection();
-        $this->partnerAccounts = new ArrayCollection();
-        $this->creator_deposits = new ArrayCollection();
         $this->creatorAccounts = new ArrayCollection();
+        $this->partners = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -216,21 +176,14 @@ class User implements UserInterface
         return $this->id;
     }
 
-    /**
+     /**
      * A visual identifier that represents this user.
      *
      * @see UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
+        return (string) $this->email;
     }
 
     /**
@@ -241,8 +194,6 @@ class User implements UserInterface
        return [$this->userRoles->getRoleName()];
 
     }
-
-    
 
     /**
      * @see UserInterface
@@ -324,17 +275,6 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(string $address): self
-    {
-        $this->address = $address;
-
-        return $this;
-    }
 
     public function getIsActive(): ?bool
     {
@@ -344,30 +284,6 @@ class User implements UserInterface
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
-
-        return $this;
-    }
-
-    public function getCountry(): ?string
-    {
-        return $this->country;
-    }
-
-    public function setCountry(string $country): self
-    {
-        $this->country = $country;
-
-        return $this;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
-
-    public function setCity(string $city): self
-    {
-        $this->city = $city;
 
         return $this;
     }
@@ -447,92 +363,6 @@ class User implements UserInterface
     /**
      * @return Collection|PartnerAccount[]
      */
-    public function getPartnerAccounts(): Collection
-    {
-        return $this->partnerAccounts;
-    }
-
-    public function addPartnerAccount(PartnerAccount $partnerAccount): self
-    {
-        if (!$this->partnerAccounts->contains($partnerAccount)) {
-            $this->partnerAccounts[] = $partnerAccount;
-            $partnerAccount->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removePartnerAccount(PartnerAccount $partnerAccount): self
-    {
-        if ($this->partnerAccounts->contains($partnerAccount)) {
-            $this->partnerAccounts->removeElement($partnerAccount);
-            // set the owning side to null (unless already changed)
-            if ($partnerAccount->getOwner() === $this) {
-                $partnerAccount->setOwner(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getNinea(): ?int
-    {
-        return $this->ninea;
-    }
-
-    public function setNinea(int $ninea): self
-    {
-        $this->ninea = $ninea;
-
-        return $this;
-    }
-
-    public function getRc(): ?string
-    {
-        return $this->rc;
-    }
-
-    public function setRc(string $rc): self
-    {
-        $this->rc = $rc;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Deposit[]
-     */
-    public function getCreatorDeposits(): Collection
-    {
-        return $this->creator_deposits;
-    }
-
-    public function addCreatorDeposit(Deposit $creatorDeposit): self
-    {
-        if (!$this->creator_deposits->contains($creatorDeposit)) {
-            $this->creator_deposits[] = $creatorDeposit;
-            $creatorDeposit->setCreator($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCreatorDeposit(Deposit $creatorDeposit): self
-    {
-        if ($this->creator_deposits->contains($creatorDeposit)) {
-            $this->creator_deposits->removeElement($creatorDeposit);
-            // set the owning side to null (unless already changed)
-            if ($creatorDeposit->getCreator() === $this) {
-                $creatorDeposit->setCreator(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|PartnerAccount[]
-     */
     public function getCreatorAccounts(): Collection
     {
         return $this->creatorAccounts;
@@ -557,6 +387,49 @@ class User implements UserInterface
                 $creatorAccount->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Partner[]
+     */
+    public function getPartners(): Collection
+    {
+        return $this->partners;
+    }
+
+    public function addPartner(Partner $partner): self
+    {
+        if (!$this->partners->contains($partner)) {
+            $this->partners[] = $partner;
+            $partner->setPartnerCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removePartner(Partner $partner): self
+    {
+        if ($this->partners->contains($partner)) {
+            $this->partners->removeElement($partner);
+            // set the owning side to null (unless already changed)
+            if ($partner->getPartnerCreator() === $this) {
+                $partner->setPartnerCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar($avatar): self
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

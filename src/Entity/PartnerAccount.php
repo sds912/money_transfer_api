@@ -17,44 +17,43 @@ class PartnerAccount
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"account.write", "account.read"})
+     * @Groups({"account.read","partner.read"})
      */
     private $id;
-
-     /**
-     * @ORM\Column(type="string")
-     * @Groups({"account.write", "account.read"})
-     */
-    private $accountNumber = 0;
-
     /**
-     * @ORM\Column(type="integer")
-     * @Groups({"account.write", "account.read"})
+     * @ORM\Column(type="bigint")
+     * @Groups({"deposit.write","account.read","partner.read","partner.write"})
      */
     private $balance = 0;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"account.write", "account.read"})
+     * @Groups({"account.write", "account.read","partner.read","partner.write","user.read"})
      */
-    private $created_at;
-
+    private $createdAt;
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partnerAccounts")
-     * @Groups({"account.write", "account.read"})
-     */
-    private $owner;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="account", cascade={"persist"})
-     * @Groups({"account.write", "account.read"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Deposit", mappedBy="account", cascade={"persist","remove"})
+     * @Groups({"account.write", "account.read","partner.write"})
      */
     private $deposits;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="creatorAccounts")
+     * @Groups({"account.write", "account.read","partner.write"})
      */
     private $creator;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Partner", inversedBy="accounts")
+     * @Groups({"account.write", "account.read","user.read"})
+     */
+    private $owner;
+
+    /**
+     * @ORM\Column(type="bigint")
+     * @Groups({"account.write", "deposit.write", "deposit.read","account.read", "account.write","partner.read","partner.write","user.read"})
+     */
+    private $accountNumber;
 
   
 
@@ -72,38 +71,26 @@ class PartnerAccount
 
     
 
-    public function getBalance(): ?int
+    public function getBalance(): ?string
     {
         return $this->balance;
     }
 
-    public function setBalance(int $balance): self
+    public function setBalance(string $balance): self
     {
         $this->balance = $balance;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?\DateTime
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getOwner(): ?User
-    {
-        return $this->owner;
-    }
-
-    public function setOwner(?User $owner): self
-    {
-        $this->owner = $owner;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -139,18 +126,6 @@ class PartnerAccount
         return $this;
     }
 
-    public function getAccountNumber(): ?int
-    {
-        return $this->accountNumber;
-    }
-
-    public function setAccountNumber(int $accountNumber): self
-    {
-        $this->accountNumber = $accountNumber;
-
-        return $this;
-    }
-
     public function getCreator(): ?User
     {
         return $this->creator;
@@ -165,6 +140,30 @@ class PartnerAccount
 
     public function __toString()
     {
+        return 'compte '.$this->accountNumber;
+    }
+
+    public function getOwner(): ?Partner
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?Partner $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getAccountNumber(): ?string
+    {
         return $this->accountNumber;
+    }
+
+    public function setAccountNumber(string $accountNumber): self
+    {
+        $this->accountNumber = $accountNumber;
+
+        return $this;
     }
 }

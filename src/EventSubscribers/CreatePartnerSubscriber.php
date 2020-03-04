@@ -4,6 +4,7 @@ namespace App\EventSubscribers;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response;
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Entity\Partner;
 use App\Entity\PartnerAccount;
 use App\Entity\User;
 use App\Utils\AccountNumberGenerator;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-final class CreateAccountSubscriber implements EventSubscriberInterface
+final class CreatePartnerSubscriber implements EventSubscriberInterface
 {
    private $tokenStorage;
    private $accountNumberGenerator;
@@ -43,10 +44,10 @@ final class CreateAccountSubscriber implements EventSubscriberInterface
     public function checkPartnerAccountData(ViewEvent $event)
     {
         
-        $account = $event->getControllerResult();
+        $partner = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if (!$account instanceof PartnerAccount || (Request::METHOD_POST !== $method && Request::METHOD_PUT !== $method))
+        if (!$partner instanceof Partner || (Request::METHOD_POST !== $method && Request::METHOD_PUT !== $method))
         {
             return;
         }
@@ -58,15 +59,15 @@ final class CreateAccountSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $account->setAccountNumber($this->accountNumberGenerator->generate());
-        $account->setCreator($currentUser);
-        $account->getDeposits()[0]->setCreator($currentUser);
-        $amount = (int) $account->getDeposits()[0]->getAmount();
+        $partner->getAccounts()[0]->setAccountNumber($this->accountNumberGenerator->generate());
+        $partner->getAccounts()[0]->setCreator($currentUser);
+        $partner->getAccounts()[0]->getDeposits()[0]->setCreator($currentUser);
+        $amount = (int) $partner->getAccounts()[0]->getDeposits()[0]->getAmount();
         if($amount < 500000)
         {
             throw new HttpException(HttpFoundationResponse::HTTP_CONFLICT,'Le montant initial doit etre supérieur ou égal à 500000');
         }
-        $account->setBalance($amount);
+        $partner->getAccounts()[0]->setBalance($amount);
 
 
 

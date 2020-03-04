@@ -9,20 +9,22 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
 
 class JWTAuthSuccessListener {
 
     private $entityManager;
-    private $loginInfos;
+    private $security;
     
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        RequestStack $request
+        RequestStack $request,
+        Security $security
         )
     {
-        $this->loginInfos  = json_decode($request->getCurrentRequest()->getContent());
         $this->entityManager = $entityManager;
+        $this->security = $security;
 
     }
     
@@ -35,7 +37,7 @@ class JWTAuthSuccessListener {
     $response = $event->getResponse();
      
     $user = $this->entityManager->getRepository(User::class)->findOneBy([
-        'username'=>$this->loginInfos->username,
+        'email'=>$this->security->getUser()->getUsername(),
         'isActive' => false]);
 
     $data = $event->getData();
@@ -46,10 +48,17 @@ class JWTAuthSuccessListener {
 
        unset($data['token']);
 
-       $data['message'] = "You has been blocked. Contact your supervisor for more informations";
+       $data['message'] = "Votre compte a été bloqué, contactez votre superviseur pour de détails";
     }
+    $user = $this->entityManager->getRepository(User::class)->findOneBy([
+        'email'=>$this->security->getUser()->getUsername()]);
+    $data['user'] = [
+        'username' => $this->security->getUser()->getUsername(),
+        'role' => $this->security->getUser()->getRoles()[0],
+        'name' => $user->getLName(). ' '.$user->getFName()
+    ];
 
-        $event->setData($data);
+    $event->setData($data);
     
    
 

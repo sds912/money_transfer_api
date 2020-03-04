@@ -14,7 +14,7 @@ api_platform:
 
     collection:
         pagination:
-            items_per_page: 5
+            items_per_page: 20
             client_items_per_page: true
 
     eager_loading:

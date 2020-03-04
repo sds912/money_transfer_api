@@ -75,8 +75,8 @@ class UserDataPersister implements DataPersisterInterface
  
              if($currentRole === PermissionRoles::OWNER)
              {
-               $owner = $this->entityManager->getRepository(User::class)->findOneBY(['username'=>$currentUser->getUsername()]);
-               $employer = $this->entityManager->getRepository(User::class)->findOneBy(['username'=>$data->getUsername()]);
+               $owner = $this->entityManager->getRepository(User::class)->findOneBY(['email'=>$currentUser->getUsername()]);
+               $employer = $this->entityManager->getRepository(User::class)->findOneBy(['email'=>$data->getUsername()]);
  
                if($employer->getSupervisor()[0] != $owner)
                {
@@ -96,6 +96,7 @@ class UserDataPersister implements DataPersisterInterface
      
          }
  
+        /* 
          if($currentRole != PermissionRoles::SUPER_ADMIN)
          {
              if (PermissionRoles::SUPER_ADMIN != $dataRole) 
@@ -135,6 +136,7 @@ class UserDataPersister implements DataPersisterInterface
              }
          }
  
+         */
         $this->entityManager->persist($data);
         $this->entityManager->flush();
     } 

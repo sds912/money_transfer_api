@@ -16,6 +16,7 @@ resources:
 
   App\Entity\User: 
     attributes:
+
       filters: ["users.search_filter"]
       denormalization_context:
         groups: ['user.write']
@@ -54,14 +55,20 @@ resources:
       filters: ["partnerAccounts.search_filter"]
       normalization_context:
         groups: ['account.read']
+        
       denormalization_context:
         groups: ['account.write']
+        security: 'is_granted("EDIT", object)'
+        
+
     collectionOperations:
       post: 
         path: '/partners/accounts'
       get: 
         path:
           '/partners/accounts'
+        security: 'is_granted("ROLE_ADMIN")'
+        security_message: "vous ne pouver pas accéder à ces données"
     itemOperations:
       get: 
         path:
@@ -70,7 +77,22 @@ resources:
         path:
           '/partners/accounts/{id}'
 
-  App\Entity\Deposit: ~
+  App\Entity\Deposit: 
+    attributes:
+      filters: ["deposits.search_filter"]
+      denormalization_context:
+        groups: ["deposit.write"]
+      normalization_context:
+        groups: ["deposit.read"]
+
+  App\Entity\Partner: 
+    attributes:
+      filters: ["partner.search_filter"]
+      denormalization_context:
+        groups: ["partner.write"]
+      normalization_context:
+        groups: ["partner.read"]
+
 
 
 

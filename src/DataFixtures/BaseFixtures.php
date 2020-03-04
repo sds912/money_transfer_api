@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Agency;
+use App\Entity\Partner;
 use App\Entity\Roles;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -20,7 +21,7 @@ class BaseFixtures extends Fixture
     }
     public function load(ObjectManager $manager)
     {
-        $faker =  Factory::create('fr_FR');
+        //$faker =  Factory::create('fr_FR');
          
          $role1 = new  Roles();
          $role1->setRoleName('ROLE_SUPER_ADMIN');
@@ -54,31 +55,23 @@ class BaseFixtures extends Fixture
 
         $superAdmin = new User();
 
-        $superAdmin->setUsername($faker->userName);
         $superAdmin->setPassword($this->encoder->encodePassword($superAdmin,'super'));
-        $superAdmin->setEmail($faker->email);
-        $superAdmin->setFname($faker->firstName());
-        $superAdmin->setLname($faker->lastName);
-        $superAdmin->setPhone($faker->phoneNumber);
-        $superAdmin->setIsActive($faker->boolean(true));
-        $superAdmin->setCountry($faker->country);
-        $superAdmin->setCity($faker->city);
-        $superAdmin->setAddress($faker->address);
+        $superAdmin->setEmail('pape912.ps@gmail.com');
+        $superAdmin->setFname('Babacar');
+        $superAdmin->setLname('Senghor');
+        $superAdmin->setPhone('777443663');
+        $superAdmin->setIsActive(true);
         $role1->addUser($superAdmin);
         $manager->persist($superAdmin);
-
+        
         for ($i=0; $i < 5; $i++){
             $admin = new User();
-            $admin->setUsername($faker->userName);
             $admin->setPassword($this->encoder->encodePassword($superAdmin,'admin'));
-            $admin->setEmail($faker->email);
-            $admin->setFname($faker->firstName());
-            $admin->setLname($faker->lastName);
-            $admin->setPhone($faker->phoneNumber);
-            $admin->setIsActive($faker->boolean(true));
-            $admin->setCountry($faker->country);
-            $admin->setCity($faker->city);
-            $admin->setAddress($faker->address);
+            $admin->setEmail('email'.$i.'admin@gmail.com');
+            $admin->setFname('prenom'.$i);
+            $admin->setLname('nom'.$i);
+            $admin->setPhone('775845121'.$i);
+            $admin->setIsActive(true);
             $role2->addUser($admin);
             $admin->addSupervisor($superAdmin);
             $superAdmin->addSupervisorUser($admin);
@@ -87,47 +80,51 @@ class BaseFixtures extends Fixture
 
         
             $casher = new User();
-            $casher->setUsername($faker->userName);
             $casher->setPassword($this->encoder->encodePassword($superAdmin,'casher'));
-            $casher->setEmail($faker->email);
-            $casher->setFname($faker->firstName());
-            $casher->setLname($faker->lastName);
-            $casher->setPhone($faker->phoneNumber);
-            $casher->setIsActive($faker->boolean(true));
-            $casher->setCountry($faker->country);
-            $casher->setCity($faker->city);
-            $casher->setAddress($faker->address);
+            $casher->setEmail('email'.$i.'cashier@gmail.com');
+            $casher->setFname('prenom'.$i);
+            $casher->setLname('nom'.$i);
+            $casher->setPhone('785644255'.$i);
+            $casher->setIsActive(true);
             $role3->addUser($casher);
             $casher->addSupervisor($admin);
             $admin->addSupervisorUser($casher);
 
             $manager->persist($casher);
 
-           /*
+        
+            
+            $user = new User();
+            $user->setPassword($this->encoder->encodePassword($user,'partner'));
+            $user->setEmail('email'.$i.'cashier@gmail.com');
+            $user->setFname('prenom'.$i);
+            $user->setLname('nom'.$i);
+            $user->setPhone('785644255'.$i);
+            $user->setIsActive(true);
+            $user->addSupervisor($admin);
+            $admin->addSupervisorUser($user);
 
-
-            $owner = new User();
-            $owner->setUsername($faker->userName);
-            $$owner->setPassword($this->encoder->encodePassword($superAdmin,'owner'));
-            $owner->setEmail($faker->email);
-            $owner->setFname($faker->firstName());
-            $owner->setLname($faker->lastName);
-            $owner->setPhone($faker->phoneNumber);
-            $owner->setIsActive($faker->boolean(true));
-            $owner->setCountry($faker->country);
-            $owner->setCity($faker->city);
-            $owner->setAddress($faker->address);
-            $role4->addUser($owner);
-            $owner->addSupervisor($admin);
-            $admin->addSupervisorUser($owner);
+            $manager->persist($user);
+            
+            $partner = new Partner();
+            $partner->setPhone('785456556'.$i);
+            $partner->setCountry('senegal');
+            $partner->setCity('dakar');
+            $partner->setAddress('parcelle unite 11');
+            $partner->setNinea('DK55456986658');
+            $partner->setRc('785232822556532');
+            $partner->setUser($user);
+            
        
-            $manager->persist($owner);
+            $manager->persist($partner);
 
-            */
+            
 
         }
+
+    
         
-     
+        
 
         $manager->flush();
     }

@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DepositRepository")
@@ -15,29 +18,36 @@ class Deposit
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"deposit.read"})
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $amount;
-
-    /**
-     * @ORM\Column(type="datetime")
-     * @Assert\DateTime
-     */
-    private $created_at;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="creator_deposits")
+     * @Groups({"account.write","deposit.write","deposit.read","partner.write"})
      */
     private $creator;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\PartnerAccount", inversedBy="deposits", cascade={"persist"})
+     * @Groups({"deposit.write","deposit.read","account.write"})
      */
     private $account;
+
+    /**
+     * @ORM\Column(type="bigint")
+     * @Groups({"deposit.write","deposit.read","account.write","partner.write"})
+     */
+    private $amount;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"deposit.write","deposit.read","account.write","partner.write"})
+     */
+    private $createdAt;
+
+    
 
     public function __construct()
     {
@@ -49,29 +59,6 @@ class Deposit
         return $this->id;
     }
 
-    public function getAmount(): ?int
-    {
-        return $this->amount;
-    }
-
-    public function setAmount(int $amount): self
-    {
-        $this->amount = $amount;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
 
     public function getCreator(): ?User
     {
@@ -99,6 +86,32 @@ class Deposit
 
     public function __toString()
     {
-        return $this->account->getOwner()->getLname();
+        return 'depot '.$this->id;
     }
+
+    public function getAmount(): ?string
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(string $amount): self
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    
 }
