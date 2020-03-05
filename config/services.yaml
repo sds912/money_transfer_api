@@ -57,6 +57,13 @@ services:
       # Autoconfiguration must be disabled to set a custom priority
         autoconfigure: false
 
+    App\DataProviders\UserCollectionDataProvider:
+        tags: [{ name: 'api_platform.collection_data_provider' }]
+        arguments:
+            $collectionExtensions: !tagged api_platform.doctrine.orm.query_extension.collection
+      # Autoconfiguration must be disabled to set a custom priority
+        autoconfigure: false
+
     'App\Utils\AccountNumberGenerator': ~
 
     users.search_filter:

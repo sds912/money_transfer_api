@@ -29,7 +29,7 @@ resources:
         security_message: 'Only admin or partner add  user'
       get: 
         method: 'GET'
-        security: 'is_granted("ROLE_ADMIN")'
+        security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
         security_message: 'Only admin can access these resources'
         
     itemOperations:

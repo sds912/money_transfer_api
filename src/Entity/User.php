@@ -115,7 +115,8 @@ class User implements UserInterface
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers")
      * @Groups({
-     *  "user.write"
+     *  "user.write",
+     *  "user.read"
      * })
      */
     private $supervisor;
@@ -136,8 +137,6 @@ class User implements UserInterface
      * })
      */
     private $userRoles;
-
-    
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\PartnerAccount", mappedBy="creator")
