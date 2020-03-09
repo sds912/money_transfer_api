@@ -27,7 +27,8 @@ class User implements UserInterface
      * @Groups({
      *  "user.read",
      *  "user.write",
-     * "partner.read"
+     * "partner.read",
+     * "affect.read"
      * 
      * })
      */
@@ -39,8 +40,9 @@ class User implements UserInterface
      * @Groups({
      *  "user.write",
      * "partner.write"
+     * 
      * }) 
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * 
      */
     private $password;
@@ -52,7 +54,9 @@ class User implements UserInterface
      *  "user.read",
      *   "partner.read",
      *   "partner.write",
-     *   "account.read"
+     *   "account.read",
+     *    "affect.write",
+     * "affect.read"
      * })
      * @Assert\NotBlank()
      * @Assert\Email()
@@ -66,7 +70,9 @@ class User implements UserInterface
      *  "user.read",
      *   "partner.read",
      * "partner.write",
-     * "account.read"
+     * "account.read",
+     * "affect.write",
+     * "affect.read"
      * })
      * @Assert\NotBlank()
      */
@@ -79,7 +85,10 @@ class User implements UserInterface
      *  "user.write",
      *   "partner.read",
      *   "partner.write",
-     *   "account.read"
+     *   "account.read",
+     *   "affect.write",
+     * "affect.read"
+     * 
      * })
      * @Assert\NotBlank()
      */
@@ -92,7 +101,8 @@ class User implements UserInterface
      *  "user.read",
      *  "partner.read",
      *  "partner.write",
-     * "account.read"
+     * "account.read",
+     *  "affect.write"
      * })
      * @Assert\NotBlank()
      */
@@ -107,7 +117,9 @@ class User implements UserInterface
      *   "block.read",
      *   "partner.write",
      *   "partner.read",
-     *   "account.read"
+     *   "account.read",
+     *    "affect.write",
+     *    "affect.read"
      * })
      * @Assert\Type("bool")
      */
@@ -116,7 +128,8 @@ class User implements UserInterface
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="supervisorUsers")
      * @Groups({
      *  "user.write",
-     *  "user.read"
+     *  "user.read",
+     *  "affect.write"
      * })
      */
     private $supervisor;
@@ -124,7 +137,9 @@ class User implements UserInterface
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="supervisor")
      * @Groups({
-     *  "user.write"
+     *  "user.write",
+     * "partner.read"
+     * 
      * })
      */
     private $supervisorUsers;
@@ -133,13 +148,15 @@ class User implements UserInterface
      * @ORM\ManyToOne(targetEntity="App\Entity\Roles", inversedBy="users")
      * @Groups({
      *  "user.read",
-     *  "user.write"
+     *  "user.write",
+     * "affect.write",
+     * "account.read"
      * })
      */
     private $userRoles;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PartnerAccount", mappedBy="creator")
+     * @ORM\OneToMany(targetEntity="App\Entity\PartnerAccount", mappedBy="creator", cascade={"persist"})
      * @Groups({
      *  "user.write",
      *   "partner.read"
@@ -158,8 +175,21 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="blob", nullable=true)
+     * @Groups({"affect.write"})
      */
     private $avatar;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\PartnerAccount", inversedBy="employees", cascade={"persist"})
+     * @Groups({"user.write","partner.read"})
+     */
+    private $partnerAccount;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Affectation", mappedBy="employee", cascade={"persist", "remove"})
+     * @Groups({"partner.read"})
+     */
+    private $affectation;
 
     
     public function __construct()
@@ -429,6 +459,36 @@ class User implements UserInterface
     public function setAvatar($avatar): self
     {
         $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getPartnerAccount(): ?PartnerAccount
+    {
+        return $this->partnerAccount;
+    }
+
+    public function setPartnerAccount(?PartnerAccount $partnerAccount): self
+    {
+        $this->partnerAccount = $partnerAccount;
+
+        return $this;
+    }
+
+    public function getAffectation(): ?Affectation
+    {
+        return $this->affectation;
+    }
+
+    public function setAffectation(?Affectation $affectation): self
+    {
+        $this->affectation = $affectation;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newEmployee = null === $affectation ? null : $this;
+        if ($affectation->getEmployee() !== $newEmployee) {
+            $affectation->setEmployee($newEmployee);
+        }
 
         return $this;
     }

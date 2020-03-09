@@ -67,7 +67,7 @@ resources:
       get: 
         path:
           '/partners/accounts'
-        security: 'is_granted("ROLE_ADMIN")'
+        security: 'is_granted("ROLE_ADMIN") or is_granted("ROLE_AGENCY_OWNER")'
         security_message: "vous ne pouver pas accéder à ces données"
     itemOperations:
       get: 
@@ -92,8 +92,24 @@ resources:
         groups: ["partner.write"]
       normalization_context:
         groups: ["partner.read"]
+  App\Entity\Affectation:
+    attributes:
+      denormalization_context:
+        groups: ["affect.write"]
+      normalization_context: 
+        groups: ["affect.read"]
+      collection_operations: 
+        get: 
+          method: 'GET'
+          security: 'is_granted("ROLE_USER")'
+          security_message:  "Vous n'avez pas acces à ces informations"
+        post:
+          method: 'POST'
+          security: 'is_granted("ROLE_USER")'
+          security_message:  "Vous n'avez pas acces à ces informations"
+      itemOperations: ~
 
-
+  App\Entity\Contract: ~
 
 
       

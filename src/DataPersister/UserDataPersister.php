@@ -45,20 +45,13 @@ class UserDataPersister implements DataPersisterInterface
     {
 
         $currentUser = $this->security->getUser();
-        $password = $data->getUsername();
+        $password = $data->getPhone();
         $currentRole = $currentUser->getRoles()[0];
         $dataRole = $data->getUserRoles()->getRoleName();
         
         $data->setPassword($this->encoder->encodePassword($data, $password));
         $data->eraseCredentials();
 
-
-
-        $currentUser = $this->security->getUser();
-        $password = $data->getUsername();
-        $currentRole = $currentUser->getRoles()[0];
-        $dataRole = $data->getUserRoles()->getRoleName();
-       
 
         $uri = $this->request->getCurrentRequest()->getPathInfo(); 
         $pattern = '/\/api\/users\/\d+\/block/';
@@ -96,23 +89,27 @@ class UserDataPersister implements DataPersisterInterface
      
          }
  
-        /* 
-         if($currentRole != PermissionRoles::SUPER_ADMIN)
-         {
-             if (PermissionRoles::SUPER_ADMIN != $dataRole) 
+        
+         if($currentRole != PermissionRoles::SUPER_ADMIN) {
+             if (PermissionRoles::SUPER_ADMIN === $dataRole) 
              { 
-                $data->addSupervisor($currentUser);
-             }else{
-                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can not Change Super Admin Attributes");
+                throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can not Change Super Admin Attributes");
              }
+             
+             $data->addSupervisor($currentUser);
+             
          }
+
+
          if($currentRole === PermissionRoles::OWNER)
          { 
              if ($dataRole != PermissionRoles::AGENCY_ADMIN && $dataRole != PermissionRoles::AGENCY_CASHIER)
              {
                  throw new HttpException(Response::HTTP_UNAUTHORIZED, "You can only create agency admin or agency cashier for your account");
              }
-         }else{
+         }
+         
+         if($currentRole === PermissionRoles::OWNER){
  
              if ($dataRole === PermissionRoles::AGENCY_ADMIN || $dataRole == PermissionRoles::AGENCY_CASHIER)
              {
@@ -136,7 +133,7 @@ class UserDataPersister implements DataPersisterInterface
              }
          }
  
-         */
+         
         $this->entityManager->persist($data);
         $this->entityManager->flush();
     } 

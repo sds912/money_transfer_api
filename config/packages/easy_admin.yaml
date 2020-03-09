@@ -15,4 +15,7 @@ easy_admin:
     - App\Entity\Partner
     - App\Entity\PartnerAccount
     - App\Entity\Deposit
+    - App\Entity\Affectation
+    - App\Entity\Contract
+
 

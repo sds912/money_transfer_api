@@ -1,6 +1,7 @@
 <?php
 namespace App\Listeners;
 
+use App\Entity\Partner;
 use App\Entity\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,10 +53,12 @@ class JWTAuthSuccessListener {
     }
     $user = $this->entityManager->getRepository(User::class)->findOneBy([
         'email'=>$this->security->getUser()->getUsername()]);
+    $partner = $this->entityManager->getRepository(Partner::class)->findOneBy(['user' => $user]);
     $data['user'] = [
         'username' => $this->security->getUser()->getUsername(),
         'role' => $this->security->getUser()->getRoles()[0],
-        'name' => $user->getLName(). ' '.$user->getFName()
+        'name' => $user->getLName(). ' '.$user->getFName(),
+        'ninea' => $partner !== null ? $partner->getNinea() : ''
     ];
 
     $event->setData($data);

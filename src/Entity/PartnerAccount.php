@@ -55,6 +55,18 @@ class PartnerAccount
      */
     private $accountNumber;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Affectation", mappedBy="account")
+     * @Groups({"partner.read"})
+     */
+    private $affectations;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="partnerAccount")
+     * @Groups({"account.read"})
+     */
+    private $employees;
+
   
 
     public function __construct()
@@ -62,6 +74,8 @@ class PartnerAccount
         
         $this->deposits = new ArrayCollection();
         $this->setCreatedAt(new \DateTime('now'));
+        $this->affectations = new ArrayCollection();
+        $this->employees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +177,68 @@ class PartnerAccount
     public function setAccountNumber(string $accountNumber): self
     {
         $this->accountNumber = $accountNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Affectation[]
+     */
+    public function getAffectations(): Collection
+    {
+        return $this->affectations;
+    }
+
+    public function addAffectation(Affectation $affectation): self
+    {
+        if (!$this->affectations->contains($affectation)) {
+            $this->affectations[] = $affectation;
+            $affectation->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAffectation(Affectation $affectation): self
+    {
+        if ($this->affectations->contains($affectation)) {
+            $this->affectations->removeElement($affectation);
+            // set the owning side to null (unless already changed)
+            if ($affectation->getAccount() === $this) {
+                $affectation->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    public function addEmployee(User $employee): self
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees[] = $employee;
+            $employee->setPartnerAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmployee(User $employee): self
+    {
+        if ($this->employees->contains($employee)) {
+            $this->employees->removeElement($employee);
+            // set the owning side to null (unless already changed)
+            if ($employee->getPartnerAccount() === $this) {
+                $employee->setPartnerAccount(null);
+            }
+        }
 
         return $this;
     }
