@@ -17,5 +17,5 @@ easy_admin:
     - App\Entity\Deposit
     - App\Entity\Affectation
     - App\Entity\Contract
-
-
+    - App\Entity\TransactionType
+    - App\Entity\Transaction

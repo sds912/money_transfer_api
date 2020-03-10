@@ -51,7 +51,7 @@ class PartnerAccount
 
     /**
      * @ORM\Column(type="bigint")
-     * @Groups({"account.write", "deposit.write", "deposit.read","account.read", "account.write","partner.read","partner.write","user.read"})
+     * @Groups({"transact.read","account.write", "deposit.write", "deposit.read","account.read", "account.write","partner.read","partner.write","user.read"})
      */
     private $accountNumber;
 
@@ -67,6 +67,7 @@ class PartnerAccount
      */
     private $employees;
 
+   
   
 
     public function __construct()
@@ -76,6 +77,7 @@ class PartnerAccount
         $this->setCreatedAt(new \DateTime('now'));
         $this->affectations = new ArrayCollection();
         $this->employees = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -242,4 +244,8 @@ class PartnerAccount
 
         return $this;
     }
+
+
+
+    
 }

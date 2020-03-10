@@ -47,12 +47,13 @@ class Affectation
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"partner.read"})
+     * @Groups({"partner.read", "affect.read", "affect.write"})
      */
     private $addedAt;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="affectation", cascade={"persist", "remove"})
+     * @Groups({"affect.read", "affect.write"})
      */
     private $employee;
 

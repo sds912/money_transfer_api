@@ -56,7 +56,8 @@ class User implements UserInterface
      *   "partner.write",
      *   "account.read",
      *    "affect.write",
-     * "affect.read"
+     *    "affect.read",
+     *    "transact.read"
      * })
      * @Assert\NotBlank()
      * @Assert\Email()
@@ -72,7 +73,8 @@ class User implements UserInterface
      * "partner.write",
      * "account.read",
      * "affect.write",
-     * "affect.read"
+     * "affect.read",
+     * "transact.read"
      * })
      * @Assert\NotBlank()
      */
@@ -87,7 +89,8 @@ class User implements UserInterface
      *   "partner.write",
      *   "account.read",
      *   "affect.write",
-     * "affect.read"
+     * "affect.read",
+     * "transact.read"
      * 
      * })
      * @Assert\NotBlank()
@@ -102,7 +105,8 @@ class User implements UserInterface
      *  "partner.read",
      *  "partner.write",
      * "account.read",
-     *  "affect.write"
+     *  "affect.write",
+     * "transact.read"
      * })
      * @Assert\NotBlank()
      */
@@ -119,7 +123,8 @@ class User implements UserInterface
      *   "partner.read",
      *   "account.read",
      *    "affect.write",
-     *    "affect.read"
+     *    "affect.read",
+     *    "transact.read"
      * })
      * @Assert\Type("bool")
      */
@@ -191,6 +196,11 @@ class User implements UserInterface
      */
     private $affectation;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="author")
+     */
+    private $transactions;
+
     
     public function __construct()
     {
@@ -198,6 +208,7 @@ class User implements UserInterface
         $this->supervisorUsers = new ArrayCollection();
         $this->creatorAccounts = new ArrayCollection();
         $this->partners = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -488,6 +499,37 @@ class User implements UserInterface
         $newEmployee = null === $affectation ? null : $this;
         if ($affectation->getEmployee() !== $newEmployee) {
             $affectation->setEmployee($newEmployee);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->contains($transaction)) {
+            $this->transactions->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getAuthor() === $this) {
+                $transaction->setAuthor(null);
+            }
         }
 
         return $this;

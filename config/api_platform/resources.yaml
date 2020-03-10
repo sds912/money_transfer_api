@@ -111,6 +111,21 @@ resources:
 
   App\Entity\Contract: ~
 
+  App\Entity\Transaction: 
+    attributes:
+      denormalization_context:
+        groups: ["transact.write"]
+      normalization_context: 
+        groups: ["transact.read"]
+
+  App\Entity\TransactionType: 
+    attributes:
+      denormalization_context:
+        groups: ["transact-type.write"]
+      normalization_context: 
+        groups: ["transact-type.read"]
+  
+
 
       
  
